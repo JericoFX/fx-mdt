@@ -24,9 +24,9 @@ normal mdt (?)
 
 ## IMAGES
 
-![Hi](https://prnt.sc/26iqrh7)
-![Hi](https://prnt.sc/26iqrm0)
-![Hi](https://prnt.sc/26iqrqn)
+![Hi](https://image.prntscr.com/image/K9IGW_uHRCe1JHfF4j3zvw.png)
+![Hi](https://image.prntscr.com/image/2F2kSWJqRl2DncrG7IvDSg.png)
+![Hi](https://image.prntscr.com/image/yNWXjyUVRmmXHebAu7XgSA.png)
 
 ## Bugs or TO-DO
 
@@ -37,6 +37,12 @@ normal mdt (?)
 
 * Finish Report section.
 ```
+# THANKS
+
+Special thanks to TASO! and Project Error for his NUI boilerplate
+
+  https://github.com/project-error/svelte-lua-boilerplate
+
 
 # License
 
