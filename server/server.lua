@@ -106,7 +106,7 @@ QBCore.Functions.CreateCallback("fx-mdt:GetPlayerInfo",function(source,cb,id)
                       }
       else
         Data[#Data+1] = {Name = result[k].firstname,
-        LastName = result[k].lastname:gsub('$"',""),
+        LastName = result[k].lastname,
         CitizenID = result[k].citizenid,
         Rank = result[k].rank,
         JobName = result[k].jobname,

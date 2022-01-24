@@ -37,7 +37,7 @@
           {/each}
         </tbody>
       </table>
-     <button on:click="{closeModal}" class="btn fixed-bottom">Close</button>
+     <button on:click="{closeModal}" class="btn fixed-bottom" style="left:43%">Close</button>
     </div>
   </div>
 {/if}
