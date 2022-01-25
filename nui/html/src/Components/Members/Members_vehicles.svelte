@@ -23,9 +23,9 @@
         </div>
 
         <div class="modelsName absolute-center" style="left:25%;top:35%;">
-          <p class="absolute-center text-h6 text-white" style="left:16%">Brand</p>
+          <p class="absolute-center text-h6 text-white" style="left:16%">Garage</p>
           <div class="modelsData absolute-right">
-            <p class="absolute-center text-capitalize" style="color:white">something</p>
+            <p class="absolute-center text-capitalize" style={vehicles.state === 2 ? 'color:red' : 'color:white'}>{vehicles.state === 0 ? 'Out' : vehicles.state === 1 ? vehicles.garage : 'Impounded'}</p>
           </div>
         </div>
 
@@ -39,33 +39,31 @@
         <div class="modelsName absolute-center" style="left:75%;top:55%;">
           <p class="absolute-center text-h6 text-white" style="left:16%">Body</p>
           <div class="modelsData absolute-right">
-            <div
-              class="modelsData"
-              style={"background: #2901CB;      box-shadow: inset 0px 4px 4px #000000; width:"+vehicles.bodyHealth / 10+"%"}            />
+            <div class="modelsData" style={'background: #2901CB;      box-shadow: inset 0px 4px 4px #000000; width:' + vehicles.bodyHealth / 10 + '%'} />
           </div>
         </div>
         <!-- 	Engine -->
         <div class="modelsName absolute-center" style="left:75%;top:35%;">
           <p class="absolute-center text-h6 text-white" style="left:16%">Engine</p>
           <div class="modelsData absolute-right">
-            <div
-              class="modelsData"
-              style={"background: #CB6201; box-shadow: inset 0px 4px 4px #000000; width:"+vehicles.engineHealth / 10+"%"} />
+            <div class="modelsData" style={'background: #CB6201; box-shadow: inset 0px 4px 4px #000000; width:' + vehicles.engineHealth / 10 + '%'} />
           </div>
         </div>
         <!-- 	Body -->
         <div class="modelsName absolute-center" style="left:75%;top:15%;">
           <p class="absolute-center text-h6 text-white" style="left:16%">Fuel</p>
           <div class="modelsData absolute-right">
-            <div
-              class="modelsData"
-              style={"background: #CB7A01; box-shadow: inset 0px 4px 4px #000000; width:"+vehicles.fuelLevel +"%"}
-            />
+            <div class="modelsData" style={'background: #CB7A01; box-shadow: inset 0px 4px 4px #000000; width:' + vehicles.fuelLevel + '%'} />
           </div>
         </div>
-        <div on:click="{sendData}" class="absolute-center" style="top:90%;">
-          <div class="button absolute-center">
-            <p class="absolute-center text-uppercase" style="color:white">Close</p>
+        <div  class="absolute-left" style="top:80%;left:20%;">
+          <div class="button drop-shadow-md hover:drop-shadow-xl active:invert drop-shadow-xl  absolute-center">
+            <p class="absolute-center text-uppercase botoncerrar" style="color:white">Add Report</p>
+          </div>
+        </div>
+        <div on:click="{sendData}" class="absolute-right" style="top:80%;right:20%;">
+          <div class="button drop-shadow-md hover:drop-shadow-xl active:invert drop-shadow-xl  absolute-center">
+            <p class="absolute-center text-uppercase botoncerrar" style="color:white">Close</p>
           </div>
         </div>
       </div>
@@ -78,7 +76,7 @@
     position: absolute;
     width: 537px;
     height: 100%;
-    border-radius: 5px;
+    border-radius: 10px;
   }
   .my-back {
     background-color: rgba(255, 255, 55, 0.0001) !important;
@@ -97,7 +95,7 @@
     height: 59%;
     background: #0a0a0b;
     box-shadow: 0px 4px 4px #000000, inset 0px 4px 4px rgba(255, 255, 255, 0.06);
-    border-radius: 5px;
+    border-radius: 10px;
   }
 
   :root {
@@ -111,7 +109,7 @@
     max-height: 100%;
     background: #191921;
     box-shadow: 0px 4px 4px #000000;
-    border-radius: 5px;
+    border-radius: 10px;
   }
 
   .modelsData {
@@ -121,7 +119,7 @@
     max-height: 100%;
     background: #343441;
     box-shadow: inset 0px 4px 4px #000000;
-    border-radius: 5px;
+    border-radius: 10px;
   }
   .button {
     position: absolute;
@@ -129,7 +127,15 @@
     height: 64px;
 
     background: #343441;
+    box-shadow: 0px 0px 0px #000000;
+    border-radius: 10px;
+    transition: 0.5s;
+  }
+  .button:hover {
     box-shadow: 0px 4px 4px #000000;
-    border-radius: 5px;
+  }
+  .button:active {
+    transition: 0.1s;
+    box-shadow: inset 0px 4px 4px #000000;
   }
 </style>

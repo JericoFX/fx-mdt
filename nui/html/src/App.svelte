@@ -83,7 +83,7 @@
       class="myinfo-container absolute-right"
       style="top:31px;right:12px;background: #101014;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-    border-radius: 5px;width: 191px;
+    border-radius: 10px;width: 191px;
     height: 255px; "
     >
       <div class="onDutyInfo  absolute-bottom buttonRanks shadow" style="position:absolute;        left:5%;        bottom:6%;      ">
@@ -111,7 +111,8 @@
   </div>
 
 {/if}
-<style>
+
+<style global>
   :root{
     background-color: transparent;
   }
@@ -132,7 +133,7 @@
     max-width: 100%;
     max-height: 100%;
     background: #0c0c0f;
-    border-radius: 5px;
+    border-radius: 10px;
   }
   .bodyApp {
     position: absolute;
@@ -141,19 +142,19 @@
     max-width: 100%;
     max-height: 100%;
     background: #0a0a0b;
-    border-radius: 5px;
+    border-radius: 10px;
   }
   .information {
     position: absolute;
     width: 21.8vh;
     height: 38.5vh;
     left: 12px;
-    top: 362px;
+    top: 44%;
     max-width: 100%;
     max-height: 100%;
     background: #101014;
 
-    border-radius: 5px;
+    border-radius: 10px;
   }
   .logo {
     position: absolute;
@@ -165,7 +166,7 @@
     max-height: 100%;
     background: #101014;
 
-    border-radius: 5px;
+    border-radius: 10px;
   }
   .image {
     position: absolute;
@@ -176,7 +177,7 @@
     max-width: 100%;
     max-height: 100%;
     filter: drop-shadow(0px 4px 4px #000000);
-    border-radius: 5px;
+    border-radius: 10px;
   }
 
   .helppanel {
@@ -187,7 +188,7 @@
     top: 430px;
     background: #101014;
 
-    border-radius: 5px;
+    border-radius: 10px;
     max-width: 100%;
     max-height: 100%;
   }
@@ -199,7 +200,7 @@
     max-width: 100%;
     max-height: 100%;
     background: rgb(16, 16, 20);
-    border-radius: 5px;
+    border-radius: 10px;
   }
   :global(.shadow){
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0);
@@ -214,7 +215,7 @@
     width: 191px;
     height: 94px;
     background: rgba(25, 25, 33, 0.96);
-    border-radius: 5px;
+    border-radius: 10px;
   }
   .polices-text {
     font-style: normal;

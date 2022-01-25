@@ -19,7 +19,7 @@
   <div class="modal-overlay" transition:fade={{duration: 100}}>
     <div class="my-back fit" />
     <div class="modals absolute-center">
-      <table class="table w-full table-zebra">
+      <table class="table w-full table-zebra" style="width:100%">
         <thead>
           <tr>
             <th />
@@ -49,7 +49,7 @@
     height: 245px;
     background: rgba(25, 25, 33, 0.96);
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.59);
-    border-radius: 5px;
+    border-radius: 10px;
   }
   .my-back {
     background-color: rgba(255, 255, 55, 0.0001) !important;

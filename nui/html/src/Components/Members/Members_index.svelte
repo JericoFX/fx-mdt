@@ -158,7 +158,6 @@
        
         </div>
       </div>
-
       <div class="absolute-right " style="top:47%;right:2%" >
         <p
         class="text-center" style="top: 2%;left:0%;position: relative;">
@@ -169,7 +168,7 @@
 
       <div class="Casos absolute-bottom" style="position: absolute;      width: 664px;      height: 138px;left:17%;">
         <div class="box" style="position: absolute;width: 664px;height: 111px;background: #191921; box-shadow: 0px 4px 4px #000000, inset 0px 4px 4px #000000;
-        border-radius: 5px;">
+        border-radius: 10px;">
 
         </div>
         <p class="absolute-center text-h6" style="position:absolute;top:-7%;">
@@ -190,18 +189,19 @@
         <button class="btn btn-ghost btn-sm rounded-btn"> About </button>
       </div>
     </div>
-    <div class="navbar-end">
+    <!-- <div class="navbar-end">
       <button class="btn btn-square btn-ghost">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
         </svg>
       </button>
-      <button on:click={openModal} class="btn btn-square btn-ghost">
+      <button  class="btn btn-square btn-ghost">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
       </button>
-    </div>
+    </div> -->
+
   </div>
 
   <div id="id" />
@@ -222,7 +222,7 @@
     border-radius: 24px;
   }
   .background {
-    border-radius: 5px;
+    border-radius: 10px;
     box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.6);
     background: #000000;
   }
@@ -230,7 +230,7 @@
     position: absolute;
 
     background: #0c0c0f;
-    border-radius: 5px;
+    border-radius: 10px;
     width: 100%;
     height: 91%;
     box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.6);
@@ -242,7 +242,7 @@
     height: 64px;
     background: #191921;
     box-shadow: 0px 4px 4px #000000;
-    border-radius: 5px;
+    border-radius: 10px;
   }
   .datosLegacy {
     position: absolute;
@@ -251,13 +251,13 @@
 
     background: #343441;
     box-shadow: inset 0px 4px 4px #000000;
-    border-radius: 5px;
+    border-radius: 10px;
   }
   .VandH {
     width: 315px;
     height: 111px;
     background: #191921;
     box-shadow: 0px 4px 4px #000000, inset 0px 4px 4px #000000;
-    border-radius: 5px;
+    border-radius: 10px;
   }
 </style>

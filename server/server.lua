@@ -74,7 +74,7 @@ end, false)
 
 function GetVehicleModsInfo(id)
 local p = promise.new()
-local players = exports.oxmysql:fetchSync("SELECT plate,vehicle, JSON_EXTRACT(mods, '$.engineHealth') AS engineHealth,JSON_EXTRACT(mods, '$.bodyHealth') AS bodyHealth,JSON_EXTRACT(mods, '$.fuelLevel') AS fuelLevel FROM player_vehicles WHERE citizenid = ?",{id})
+local players = exports.oxmysql:fetchSync("SELECT plate,vehicle,garage,state, JSON_EXTRACT(mods, '$.engineHealth') AS engineHealth,JSON_EXTRACT(mods, '$.bodyHealth') AS bodyHealth,JSON_EXTRACT(mods, '$.fuelLevel') AS fuelLevel FROM player_vehicles WHERE citizenid = ?",{id})
 p:resolve(players)
 return Citizen.Await(p)
 end

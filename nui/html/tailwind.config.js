@@ -1,16 +1,12 @@
 module.exports = {
+  content: ['./public/index.html', './src/**/*.svelte'],
   purge: {
-    enabled: !process.env.ROLLUP_WATCH,
-    content: ['./public/index.html', './src/**/*.svelte',"./src/**/*.ts"],
-    variants: {
-      width: ["responsive", "hover", "focus"]
-  }
+    content: ['./public/index.html', './src/**/*.svelte'],
+  },
+  theme: {
+    extend: {},
   },
   plugins: [
     require('daisyui'),
   ],
-  future: {
-    purgeLayersByDefault: true,
-    removeDeprecatedGapUtilities: true,
-  },
 }

@@ -11,10 +11,10 @@ client_scripts {
 }
 files {
     'nui/html/public/index.html',
-    'nui/html/public/build/*.css',
-    'nui/html/public/build/*.js',
-    'nui/html/public/build/*.map',
-    'nui/html/public/*.*',
+    'nui/html/public/build/bundle.css',
+    'nui/html/public/build/bundle.js',
+    'nui/html/public/build/bundle.map',
+    'nui/html/public/*.css',
     'nui/html/public/iconos/*.png',
     'nui/html/public/iconos/*.jpg'
 }

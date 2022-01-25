@@ -40,22 +40,24 @@ export default {
 	},
 	plugins: [
 		svelte({
-			preprocess: sveltePreprocess({ sourceMap: !production }),
+			preprocess: sveltePreprocess({ sourceMap: false}),
 			compilerOptions: {
 				// enable run-time checks when not in production
-				dev: !production
+				dev: !production,
+				// css: css => { css.write('bundle.css') },
 			},
-			preprocess: sveltePreprocess({
-        sourceMap: !production,
-      }),
 		}),
+
+postcss({ extract: true, minimize: true,sourceMap: false }),
+
 		// we'll extract any component CSS out into
 		// a separate file - better for performance
-		postcss({
-      plugins: [
-				require("tailwindcss"), 
-			require("autoprefixer"),]
-    }),
+		// postcss({
+			
+		// 		extract: true,
+		// 		sourceMap: true,
+    //   plugins: []
+    // }),
 
 		// If you have external dependencies installed from
 		// npm, you'll most likely need these plugins. In
