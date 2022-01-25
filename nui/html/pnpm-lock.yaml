@@ -24,13 +24,17 @@ specifiers:
   svelte-check: ^1.6.0
   svelte-preprocess: ^4.10.2
   svelte-spa-router: ^3.2.0
+  svelte-step-wizard: ^0.0.2
   tailwindcss: npm:@tailwindcss/postcss7-compat@^2.2.17
   tslib: ^2.3.1
   typescript: ^4.5.5
+  uuid: ^8.3.2
 
 dependencies:
   sirv-cli: 1.0.14
   svelte-spa-router: 3.2.0
+  svelte-step-wizard: 0.0.2
+  uuid: 8.3.2
 
 devDependencies:
   '@fullhuman/postcss-purgecss': 4.1.3_postcss@8.4.5
@@ -2477,6 +2481,10 @@ packages:
       regexparam: 2.0.0
     dev: false
 
+  /svelte-step-wizard/0.0.2:
+    resolution: {integrity: sha512-qpJUqzJwOiKvkMVMnsntdyglMlijRrdrfVFwicc7WV0j8egzszQVXDwzYnXcRyVY7IMLttkWtC+yhVRmwr0cuw==}
+    dev: false
+
   /svelte/3.46.2:
     resolution: {integrity: sha512-RXSAtYNefe01Sb1lXtZ2I+gzn3t/h/59hoaRNeRrm8IkMIu6BSiAkbpi41xb+C44x54YKnbk9+dtfs3pM4hECA==}
     engines: {node: '>= 8'}
@@ -2566,6 +2574,11 @@ packages:
   /util-deprecate/1.0.2:
     resolution: {integrity: sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8=}
     dev: true
+
+  /uuid/8.3.2:
+    resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    hasBin: true
+    dev: false
 
   /which-module/2.0.0:
     resolution: {integrity: sha1-2e8H3Od7mQK4o6j6SzHD4/fm6Ho=}

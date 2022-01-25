@@ -5,3 +5,5 @@ export const Rank = writable("")
 export const PolicesOnDuty = writable(0) // Amount of polices Online
 export const PolicesOnCount = writable([]) // Polices Online on Duty
 export const Vehicles = writable([]) // Polices Online on Duty
+export const ImagesReport = writable([]) // Report Images
+export const IS_VISIBLE = writable(false)

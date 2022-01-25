@@ -13,8 +13,7 @@ RegisterNetEvent("fx-mdt:client:GetPolicesOnDuty",
     })
 
 end)
-
-RegisterCommand("jericofxs", function(source, args)
+function OpenData()
     local Name = QBCore.Functions.GetPlayerData().charinfo.firstname .. " " ..
                      QBCore.Functions.GetPlayerData().charinfo.lastname
     local Rank = QBCore.Functions.GetPlayerData().job.grade.name
@@ -24,7 +23,53 @@ RegisterCommand("jericofxs", function(source, args)
         data = {visible = true, name = Name, onDuty = OnDuty, rank = Rank}
     })
     SetNuiFocus(true, true)
+end
+
+RegisterCommand("jericofxs", function(source, args)
+    OpenData()
 end, false)
+
+
+RegisterNUICallback("sendVehicleData", function(data,cb)
+    local Datos = data.Info
+    TriggerServerEvent("fx-mdt:server:InsertReport",Datos)
+    cb({})
+end)
+RegisterNUICallback("TakePhoto", function(data,cb)
+    SetNuiFocus(false, false)
+    takePhoto = true
+    while takePhoto do
+
+        if IsControlJustPressed(1, 177) then -- CANCEL
+            OpenData()
+            cb(json.encode({ url = nil }))
+            takePhoto = false
+
+            break
+        elseif IsControlJustPressed(1, 176) then -- TAKE.. PIC
+            QBCore.Functions.TriggerCallback("fx-mdt:server:GetWebhook",function(hook)
+                if hook then
+                    exports['screenshot-basic']:requestScreenshotUpload(tostring(hook), "files[]", function(data)
+                        local image = json.decode(data)
+                        cb(json.encode(image.attachments[1].proxy_url))
+                    end)
+                else
+                    return
+                end
+            end)
+            takePhoto = false
+        end
+        HideHudComponentThisFrame(7)
+        HideHudComponentThisFrame(8)
+        HideHudComponentThisFrame(9)
+        HideHudComponentThisFrame(6)
+        HideHudComponentThisFrame(19)
+        HideHudAndRadarThisFrame()
+        EnableAllControlActions(0)
+        Wait(0)
+    end
+
+end)
 
 RegisterNUICallback("exitMDT", function(cb)
     SetNuiFocus(false, false)

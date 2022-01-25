@@ -8,6 +8,7 @@
     open = false;
     dispatch('playerSelected', {open});
   };
+
 </script>
 
 {#if open}
@@ -104,7 +105,7 @@
   .modelsName {
     position: absolute;
     width: 315px;
-    height: 64px;
+    height: 23px;
     max-width: 100%;
     max-height: 100%;
     background: #191921;

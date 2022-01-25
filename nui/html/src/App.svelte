@@ -2,9 +2,9 @@
   import Router, {push} from 'svelte-spa-router';
   import routes from './utils/router';
   import {fetchNui} from "./utils/fetchNui"
-  import {Name,OnDuty,PolicesOnDuty,Rank,PolicesOnCount} from './store/store';
+  import {Name,OnDuty,PolicesOnDuty,Rank,PolicesOnCount,IS_VISIBLE} from './store/store';
   import { useNuiEvent } from './utils/useNuiEvent';
-  $: isVisible = false
+  $: isVisible = true
 
   const APP = [
     {name: 'Members', icon: 'iconos/people.png'},
@@ -16,7 +16,7 @@
     push(`/${name}`);
   };
   useNuiEvent("openMDT",({visible,name,onDuty,rank})=>{
-    isVisible = visible
+    $IS_VISIBLE = visible
     $Name = name
     $OnDuty = onDuty
     $Rank = rank
@@ -27,7 +27,7 @@
   })
   function handleKeydown(event) {
     if (event.keyCode === 27) {
-      isVisible = false
+      $IS_VISIBLE = false
       fetchNui('exitMDT');
     }
   }
@@ -37,7 +37,7 @@
 }
 </script>
 <svelte:window on:keydown={handleKeydown} />
-{#if isVisible}
+{#if $IS_VISIBLE}
 
   <div class="container fixed-center2 non-selectable">
     <div class="bodyApp fixed-center">
@@ -117,7 +117,7 @@
     background-color: transparent;
   }
   :global(*) {
-    font-family: Poppins;
+    font-family: 'Poppins', sans-serif;
     font-style: normal;
     font-weight: normal;
     font-size: 14px;
