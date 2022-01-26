@@ -64,20 +64,57 @@ function GetPolicesOnD()
     return Citizen.Await(p)
 end
 
+function GetAllReports(id)
+
+    local Data = {}
+    local reports
+    if id then
+        reports = exports.oxmysql:fetchSync(
+                      "SELECT id,citizenid,name,lastname,location,vehicleplate,information,evidencia, imagenes FROM fx_reports WHERE id = ?",
+                      {id})
+
+    else
+        reports = exports.oxmysql:fetchSync(
+                      "SELECT id,citizenid,name,lastname,location,vehicleplate,information,evidencia, imagenes  FROM fx_reports")
+        for k, v in ipairs(reports) do
+            local element = reports[k]
+            Data[#Data + 1] = {
+                name = element.name,
+                lastname = element.lastname,
+                id = element.id,
+                location = element.location,
+                vehicleplate = element.vehicleplate,
+                information = element.information,
+                evidencia = element.evidencia,
+                imagenes = json.decode(element.imagenes)
+            }
+        end
+
+    end
+
+    return Data
+end
+
 function IsPolice(src)
-  print(src)
+
     local p = promise.new()
     local Player = QBCore.Functions.GetPlayer(src)
     p:resolve(Player.PlayerData.job.name)
     return Citizen.Await(p)
 end
+QBCore.Functions.CreateCallback("fx-mdt:server:GetReports",
+                                function(source, cb, id)
+    print(source)
+    if not id then
+        cb(GetAllReports())
+    else
+        cb(GetAllReports(id))
+    end
+end)
 
-RegisterCommand("getpo", function(source, args)
-    local src = source
-    local result = IsPolice(src)
-    print(result)
-
-end, false)
+RegisterCommand("getpo",
+                function(source, args) print(json.encode(GetAllReports())) end,
+                false)
 
 function GetVehicleModsInfo(id)
     local p = promise.new()
@@ -144,18 +181,61 @@ QBCore.Functions.CreateCallback("fx-mdt:server:GetWebhook", function(source, cb)
     end
 end)
 
-RegisterNetEvent("fx-mdt:server:InsertReport",function(data)
-QBCore.Debug(data)
-   local src = source 
+RegisterNetEvent("fx-mdt:server:InsertReport", function(data)
+    QBCore.Debug(data)
+    local src = source
 
-   exports.oxmysql:execute("INSERT INTO fx_reports (id,citizenid,name,lastname,location,vehicleplate,information,evidencia,imagenes) VALUES (?,?,?,?,?,?,?,?,?)",{data.ID,data.citizenID,data.name,data.lastName,data.location,data.vehiclePlate,data.information,data.evidencia,json.encode(data.imagen)})
+    exports.oxmysql:execute(
+        "INSERT INTO fx_reports (id,citizenid,name,lastname,location,vehicleplate,information,evidencia,imagenes) VALUES (?,?,?,?,?,?,?,?,?)",
+        {
+            data.ID, data.citizenID, data.name, data.lastName, data.location,
+            data.vehiclePlate, data.information, data.evidencia,
+            json.encode(data.imagen)
+        })
 
-  end)
-RegisterCommand("sqlputo", function(source,args) 
+end)
+RegisterCommand("sqlputo", function(source, args)
 
-  exports.oxmysql:execute('INSERT INTO fx_reports VALUES (?,?,?,?,?,?,?,?,?)',{1,1,1,2,3,4,5,6,7},function(putos) 
-  
-  
-  end)
+    exports.oxmysql:execute('INSERT INTO fx_reports VALUES (?,?,?,?,?,?,?,?,?)',
+                            {1, 1, 1, 2, 3, 4, 5, 6, 7}, function(putos) end)
 
 end, false)
+
+QBCore.Functions.CreateCallback("fx-mdt:server:GetEvidence",
+                                function(source, cb)
+    local src = source
+    local Blood = {}
+    local Bullets = {}
+    local Player = QBCore.Functions.GetPlayer(src)
+    local Item = Player.Functions.GetItemsByName("filled_evidence_bag")
+    if Item then
+        for k, v in ipairs(Item) do
+            local element = Item[k]
+
+            if element.info.type == "blood" then
+                local spl = string.fromhex(element.info.dnalabel)
+                Blood[#Blood + 1] = {
+                    type = element.info.type,
+                    street = element.info.street,
+                    bloodtype = element.info.bloodtype,
+                    dnalabel = element.info.dnalabel
+                }
+            else if element.info.type == "casing" then
+                Blood[#Blood + 1] = {
+                        type = element.info.type,
+                        street = element.info.street,
+                        ammotype = element.info.ammotype,
+                        ammolabel = element.info.ammolabel
+                    }
+
+                end
+            end
+        end
+    end
+cb(Blood)
+end)
+
+function string.fromhex(str)
+    return
+        (str:gsub('..', function(cc) return string.char(tonumber(cc, 16)) end))
+end

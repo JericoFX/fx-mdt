@@ -1,9 +1,10 @@
 <script lang="ts">
   import StepWizard from 'svelte-step-wizard';
-  import {fade, fly, slide} from 'svelte/transition';
+  import { addToast } from 'as-toast';
+  import {fade, slide} from 'svelte/transition';
   import {push} from 'svelte-spa-router';
   import {v4 as uuid4} from 'uuid';
-  import {ImagesReport, IS_VISIBLE} from '../../store/store';
+  import {IS_VISIBLE} from '../../store/store';
   import {fetchNui} from '../../utils/fetchNui';
   $: container = 1;
   const updateContainer = (id: number) => {
@@ -22,23 +23,18 @@
     evidencia: '',
     imagen: []
   };
-  // let name = ""
-  // let lastName= ""
-  // let citizenID= ""
-  // let location= ""
-  // let vehicleIsinvolved = false
-  // let vehiclePlate= ""
-
-  // let information = ""
-  // let evidencia = ""
-
+  let Data = []
+  let locationblock = false
   const sendData = () => {
     fetchNui('sendVehicleData', {Info}).then((cb) => {
-      console.log('susses!');
+      addToast("Reporte Creado con Exito","info")
     });
-    
+    setTimeout(() =>{
+      push('/')
+    },500)
+   
   };
-  const addImage = async () => {
+  const addImage =  () => {
     $IS_VISIBLE = false
     fetchNui('TakePhoto').then((cb) => {
       if (cb === null) return;
@@ -47,11 +43,55 @@
       $IS_VISIBLE = true
     });
   };
+  const addClosePlayerInfo = () => {
+    fetchNui('getClosesPlayerInfo').then((cb) => {
+      if (cb) {
+        Info.name =  cb.name.replaceAll('"', '');;
+        Info.lastName =  cb.lastname.replaceAll('"', '');
+        Info.citizenID =  cb.citizenid.replaceAll('"', '');
+      }
+    });
+  };
+  const addCurrentLocation = () =>{
+    fetchNui('getCurrentLocation').then((cb) => {
+      if (cb) {
+        Info.location =  cb
+        locationblock = true
+      }
+    });
+   
+  }
+  const getCurrentEvidence = () =>{
+    fetchNui('getEvidence').then((cb) => {
+      if (cb) {
+        Data = cb
+      }
+    });
+  }
 </script>
 <div style="{"display:" + displayed}">
 
 
 <div class="fixed-center container">
+
+  <div tabindex="0"  class="dropdown absolute-top-right" style="position:absolute;width: 37px;
+  height: 33px;background: #343441;
+  box-shadow: 0px 4px 4px #000000;
+  border-radius: 25px;top:3%;right:2%;">
+    <ul tabindex="0" class="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52">
+      <li>
+        <a on:click="{addClosePlayerInfo}" class="text-center">Closest Ped Info</a>
+      </li> 
+      <li>
+        <a  on:click="{addCurrentLocation}" >Current Location</a>
+      </li>
+      <li>
+        <a  on:click="{getCurrentEvidence}" >Add Evidence</a>
+      </li> 
+    </ul>
+  </div>
+
+
   <div class="absolute-bottom" style:bottom={'11%'}>
     <ul class="w-full steps">
       <li class="step step-primary">Basic Data</li>
@@ -61,6 +101,7 @@
   </div>
 
   <div class="bodyshape absolute-center">
+
     <StepWizard initialStep={1}>
       <StepWizard.Step num={1} let:nextStep>
         <div in:fade out:slide>
@@ -69,36 +110,36 @@
             <div class="containers fixed-right" />
             <span class="name1 absolute-left" style:left={'6%'}>Name</span>
             <div class="background fixed-right" />
-            <input bind:value={Info.name} type="text" class="inputs fixed-right" />
+            <input bind:value={Info.name} type="text" class="inputs fixed-right text-black text-h6" />
           </div>
           <!-- 		Last Name -->
           <div class="name absolute-center" style="top:30%;">
             <div class="containers fixed-right" />
             <span class="name1 absolute-left" style:left={'2%'}>Last Name</span>
             <div class="background fixed-right" />
-            <input bind:value={Info.lastName} type="text" class="inputs fixed-right" />
+            <input bind:value={Info.lastName} type="text" class="inputs fixed-right text-black text-h6" />
           </div>
           <!-- 		CitizenID -->
           <div class="name absolute-center" style="top:50%;">
             <div class="containers fixed-right" />
             <span class="name1 absolute-left" style:left={'14%'}>ID</span>
             <div class="background fixed-right" />
-            <input bind:value={Info.citizenID} type="text " class="inputs fixed-right" />
+            <input bind:value={Info.citizenID} type="text " class="inputs fixed-right text-black text-h6" />
           </div>
           <!-- 		location -->
           <div class="name absolute-center" style="top:70%;">
             <div class="containers fixed-right" />
             <span class="name1 absolute-left" style:left={'6%'}>Location</span>
             <div class="background fixed-right" />
-            <input bind:value={Info.location} type="text " class="inputs fixed-right" />
+            <input disabled="{locationblock}" bind:value={Info.location} type="text " class="inputs fixed-right text-black text-h6" />
           </div>
           <!--Vehicle Involved -->
 
           <div class="vehicle absolute-center" style="top:90%;">
             <div class="body fixed-right"><span class="vehicle_involved" style="top:1%;font-size:12px;">Vehicle Involved</span></div>
-            <input bind:checked={Info.vehicleIsinvolved} type="checkbox" class="checkbox" />
+            <input bind:checked={Info.vehicleIsinvolved} type="checkbox" class="checkbox " />
 
-            <input disabled={!Info.vehicleIsinvolved} bind:value={Info.vehiclePlate} type="text " class="inputs fixed-right text-center text-uppercase" style="width:204px;height:35px;" />
+            <input disabled={!Info.vehicleIsinvolved} bind:value={Info.vehiclePlate} type="text " class="inputs fixed-right text-center  text-black text-h6" style="width:204px;height:35px;" />
           </div>
         </div>
         <div class="buttonBack no-input fixed-bottom" on:click={() => push('/')}>
@@ -121,9 +162,30 @@
               <div class="rectangle_23" />
               <div class="rectangle_25" />
               <span class="evidencia">Evidencia</span>
-              <textarea bind:value={Info.information} class="rectangle_21" name="asd" id="" cols="2" rows="12" />
+              <textarea bind:value={Info.information} class="rectangle_21 text-black text-h6" name="asd" id="" cols="2" rows="12" />
               <!-- <div class="rectangle_21" /> -->
-              <textarea bind:value={Info.evidencia} class="rectangle_24" name="asd" id="" cols="2" rows="12" />
+              <div class="rectangle_24 scroll hide-scrollbar">
+                <table class="table fit table-zebra">
+                  <thead>
+                    <tr>
+                      <th>Type</th> 
+                      <th>Location</th> 
+                      <th>Label</th> 
+                    </tr>
+                  </thead> 
+                  <tbody>
+                    {#each Data as info }
+                    <tr>
+                      <td>{info.type}</td> 
+                      <td>{info.street}</td> 
+                      <td>{info.type === "blood" ? info.dnalabel : info.ammolabel}</td>
+                    </tr>
+                    {/each}
+                  </tbody>
+                </table>
+              </div>
+              
+              <!-- <textarea bind:value={Info.evidencia} class="rectangle_24 text-black text-h6" name="asd" id="" cols="2" rows="12" /> -->
             </div>
           </div>
         </div>
@@ -177,6 +239,19 @@
 </div>
 </div>
 <style>
+  :root{
+    --as-toast-border: 1px solid rgba(209, 213, 219, 0.3);
+--as-toast-backdrop-filter: blur(8px);
+--as-toast-shadow:
+  0px 1.4px 2.2px rgba(0, 0, 0, 0.028),
+  0px 4.7px 7.4px rgba(0, 0, 0, 0.042),
+  0px 21px 33px rgba(0, 0, 0, 0.07);
+--as-toast-btn-border: none;
+--as-toast-info-border-color: rgba(209, 213, 219, 0.3);
+--as-toast-info-background: rgba(255, 255, 255, 0.7);
+--as-toast-warn-border-color: hsl(0, 68%, 47%, 30%);
+--as-toast-warn-background: hsla(0, 69%, 80%, 0.7);
+  }
   .container {
     position: absolute;
     width: 557px;
@@ -522,37 +597,5 @@
     text-align: center;
     font-size: 16px;
     letter-spacing: 0;
-  }
-  .group_9_61_4 {
-    width: 508px;
-    height: 246.99090576171875px;
-    position: absolute;
-  }
-  .rectangle_22_60_168 {
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 1);
-    background-color: #191921;
-    position: absolute;
-    box-shadow: 0 4px 4px #000;
-    height: 246.99090576171875px;
-    left: 4%;
-    top: 29%;
-    width: 83%;
-    border-top-left-radius: 25px;
-    border-top-right-radius: 25px;
-    border-bottom-left-radius: 25px;
-    border-bottom-right-radius: 25px;
-  }
-  .rectangle_23_60_169 {
-    background-color: #343441;
-    width: 96%;
-    left: 2%;
-    top: 3%;
-    height: 94%;
-    position: absolute;
-    box-shadow: inset 0px 4px 4px #000000;
-    border-top-left-radius: 25px;
-    border-top-right-radius: 25px;
-    border-bottom-left-radius: 25px;
-    border-bottom-right-radius: 25px;
   }
 </style>

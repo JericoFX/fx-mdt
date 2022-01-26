@@ -121,6 +121,5 @@ RegisterNUICallback("getEvidence", function(data, cb)
     QBCore.Functions.TriggerCallback("fx-mdt:server:GetEvidence",function(d) 
         cb(d)
     end)
-    -- Return the evidence!!!
 end)
 

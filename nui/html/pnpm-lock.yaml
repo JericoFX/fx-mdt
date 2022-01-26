@@ -6,6 +6,7 @@ specifiers:
   '@rollup/plugin-node-resolve': ^11.2.1
   '@rollup/plugin-typescript': ^8.3.0
   '@tsconfig/svelte': ^1.0.13
+  as-toast: ^1.0.0
   autoprefixer: ^9.8.8
   concurrently: ^7.0.0
   cross-env: ^7.0.3
@@ -42,6 +43,7 @@ devDependencies:
   '@rollup/plugin-node-resolve': 11.2.1_rollup@2.66.0
   '@rollup/plugin-typescript': 8.3.0_db7de9f057e15ec305ef8f03586ea0a2
   '@tsconfig/svelte': 1.0.13
+  as-toast: 1.0.0
   autoprefixer: 9.8.8
   concurrently: 7.0.0
   cross-env: 7.0.3
@@ -321,6 +323,10 @@ packages:
   /array-union/2.1.0:
     resolution: {integrity: sha512-HGyxoOTYUyCM6stUe6EJgnd4EoewAI7zMdfqO+kGjnlZmBDz/cR5pf8r/cR4Wq60sL/p0IkcjUEEPwS3GFrIyw==}
     engines: {node: '>=8'}
+    dev: true
+
+  /as-toast/1.0.0:
+    resolution: {integrity: sha512-flCRYx+ZCzTG8uYjI7pVnul1bhyhWQFkvPseamUbH9Mgh830g8LRYY80uYV2/AlZ0IPZNjk/c2GbaRIBKoqysQ==}
     dev: true
 
   /at-least-node/1.0.0:

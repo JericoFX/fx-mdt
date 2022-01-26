@@ -1,60 +1,68 @@
 <script lang="ts">
   import Router, {push} from 'svelte-spa-router';
   import routes from './utils/router';
-  import {fetchNui} from "./utils/fetchNui"
-  import {Name,OnDuty,PolicesOnDuty,Rank,PolicesOnCount,IS_VISIBLE} from './store/store';
-  import { useNuiEvent } from './utils/useNuiEvent';
-  $: isVisible = true
-
+  import {fetchNui} from './utils/fetchNui';
+  import {Name, OnDuty, PolicesOnDuty, Rank, PolicesOnCount, IS_VISIBLE} from './store/store';
+  import {useNuiEvent} from './utils/useNuiEvent';
+  $: isVisible = true;
+  $: displayed = 'none';
+  $IS_VISIBLE = true
+  $: if ($IS_VISIBLE) {
+    displayed = 'block';
+  } else {
+    displayed = 'none';
+  }
   const APP = [
     {name: 'Members', icon: 'iconos/people.png'},
     {name: 'Vehicles', icon: 'iconos/sedan.png'},
-    {name: 'Warrants', icon: 'iconos/browse_page.png'},
+    {name: 'Reports', icon: 'iconos/browse_page.png'},
+    {name: 'Search', icon: 'iconos/analyze.png'},
   ];
   const handleClick = (name: string) => {
-
     push(`/${name}`);
   };
-  useNuiEvent("openMDT",({visible,name,onDuty,rank})=>{
-    $IS_VISIBLE = visible
-    $Name = name
-    $OnDuty = onDuty
-    $Rank = rank
-  })
-  useNuiEvent("onDutyPolices",({policesOnDuty,policesData})=>{
-      $PolicesOnDuty = policesOnDuty
-      $PolicesOnCount = policesData
-  })
+  useNuiEvent('openMDT', ({visible, name, onDuty, rank}) => {
+    $IS_VISIBLE = visible;
+    $Name = name;
+    $OnDuty = onDuty;
+    $Rank = rank;
+  });
+  useNuiEvent('onDutyPolices', ({policesOnDuty, policesData}) => {
+    $PolicesOnDuty = policesOnDuty;
+    $PolicesOnCount = policesData;
+  });
   function handleKeydown(event) {
     if (event.keyCode === 27) {
-      $IS_VISIBLE = false
+      $IS_VISIBLE = false;
       fetchNui('exitMDT');
     }
   }
-  const changeDuty = () =>{
-    $OnDuty =! $OnDuty
-  fetchNui("changeDuty",({ Duty: $OnDuty}))
-}
+  const changeDuty = () => {
+    $OnDuty = !$OnDuty;
+    fetchNui('changeDuty', {Duty: $OnDuty});
+  };
 </script>
-<svelte:window on:keydown={handleKeydown} />
-{#if $IS_VISIBLE}
 
+<svelte:window on:keydown={handleKeydown} />
+<div style={'display:' + displayed}>
   <div class="container fixed-center2 non-selectable">
     <div class="bodyApp fixed-center">
       <img src="iconos/back.jpg" style:border-radius="25px" class="fit" alt="" />
-      <div class="fixed-center q-mb-lg" style="display: flex;
+      <div
+        class="fixed-center q-mb-lg"
+        style="display: flex;
       flex-direction: row;
       flex-wrap: nowrap;
       align-content: space-between;
        justify-content: center;
-      align-items: stretch;">
+      align-items: stretch;width:100%;"
+      >
         {#each APP as ap}
           <p on:click={() => handleClick(ap.name)} class="text-center shadow mx-8  rounded-box shadow-lg bg-neutral ">
             <img src={ap.icon} class="bg-sky-600 hover:bg-sky-700" alt="altv" style:width="256px" />
             <span class="text-h6 ">{ap.name}</span>
           </p>
         {/each}
-       
       </div>
       <Router {routes} />
     </div>
@@ -109,11 +117,10 @@
       </div>
     </div>
   </div>
-
-{/if}
+</div>
 
 <style global>
-  :root{
+  :root {
     background-color: transparent;
   }
   :global(*) {
@@ -193,7 +200,6 @@
     max-height: 100%;
   }
 
-
   .buttonRanks {
     width: 17.3vh;
     height: 3.7vh;
@@ -202,12 +208,12 @@
     background: rgb(16, 16, 20);
     border-radius: 10px;
   }
-  :global(.shadow){
+  :global(.shadow) {
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0);
     transition: 0.5s;
   }
 
-  :global(.shadow:hover){
+  :global(.shadow:hover) {
     box-shadow: 0px 4px 4px #00d9ff;
   }
   .policesInfo {
