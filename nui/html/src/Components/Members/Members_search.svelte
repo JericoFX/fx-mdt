@@ -42,6 +42,7 @@
      <button on:click="{closeModal}" class="btn fixed-bottom" style="left:43%">Close</button>
     </div>
   </div>
+  
 {/if}
 
 <style>
