@@ -8,7 +8,6 @@
     open = false;
     dispatch('playerSelected', {open});
   };
-
 </script>
 
 {#if open}

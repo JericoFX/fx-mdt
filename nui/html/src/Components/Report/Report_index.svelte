@@ -89,6 +89,8 @@
 </script>
 
 <div style={'display:' + displayed}>
+    <div class="modal-overlay" transition:fade={{duration: 100}}>
+    <div class="my-back fit" />
   <div class="fixed-center container">
     <div
       tabindex="0"
@@ -181,29 +183,6 @@
                 <div class="rectangle_25" />
                 <span class="evidencia">Evidencia</span>
                 <textarea bind:value={Info.information} class="rectangle_21 text-black text-h6" name="asd" id="" cols="2" rows="12" />
-                <!-- <div class="rectangle_21" /> -->
-                <!-- <div class="rectangle_24 scroll hide-scrollbar">
-                <table class="table fit table-zebra">
-                  <thead>
-                    <tr>
-                      <th>Type</th> 
-                      <th>Location</th> 
-                      <th>Label</th> 
-                    </tr>
-                  </thead> 
-                  <tbody>
-                    {#each Data as info }
-                    <tr>
-                      <td>{info.type}</td> 
-                      <td>{info.street}</td> 
-                      <td>{info.type === "blood" ? info.dnalabel : info.ammolabel}</td>
-                    </tr>
-                    {/each}
-                  </tbody>
-                </table>
-              </div> -->
-
-                <!-- <textarea bind:value={Info.evidencia} class="rectangle_24 text-black text-h6" name="asd" id="" cols="2" rows="12" /> -->
                 <div
                   on:click={getCurrentEvidence}
                   class="button"
@@ -266,6 +245,7 @@
       </StepWizard>
     </div>
   </div>
+</div>
 </div>
 <div id="id" />
 
@@ -625,5 +605,17 @@
     text-align: center;
     font-size: 16px;
     letter-spacing: 0;
+  }
+  .my-back {
+    background-color: rgba(255, 255, 55, 0.005) !important;
+  }
+  .modal-overlay {
+    z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5) !important;
   }
 </style>
