@@ -1,24 +1,25 @@
 <script lang="ts">
   import {createEventDispatcher} from 'svelte';
-import { push } from 'svelte-spa-router';
-import { fade } from 'svelte/transition';
-import { fetchNui } from '../../utils/fetchNui';
-import Colores from "../../utils/vehicle-colors"
+  import {push} from 'svelte-spa-router';
+  import {fade} from 'svelte/transition';
+  import {fetchNui} from '../../utils/fetchNui';
+  import Colores from '../../utils/vehicle-colors';
   const dispatch = createEventDispatcher();
-  $: Plate = ""
-  let Owner ="",Color = "",Brand="",Category = "",VehicleName =""
-const getVehicleByPlate =  () =>{
-  fetchNui("getVehicleData",{Plate}).then((cb) =>{
-    Owner = cb.Owner
-    Color = getColorHex(cb.Color),
-    Brand = cb.Brand,
-    VehicleName = cb.VehicleName,
-    Category = cb.Category
-  })
-}
-const getColorHex =  (color:string):string =>{
-  return Colores.filter(col => col.ID===color)[0].Hex
-}
+  $: Plate = '';
+  let Owner = '',
+    Color = '',
+    Brand = '',
+    Category = '',
+    VehicleName = '';
+  const getVehicleByPlate = () => {
+    fetchNui('getVehicleData', {Plate}).then((cb) => {
+      Owner = cb.Owner;
+      (Color = getColorHex(cb.Color)), (Brand = cb.Brand), (VehicleName = cb.VehicleName), (Category = cb.Category);
+    });
+  };
+  const getColorHex = (color: string): string => {
+    return Colores.filter((col) => col.ID === color.toString())[0].Hex;
+  };
 </script>
 
 <div class="modal-overlay" transition:fade={{duration: 100}}>
@@ -29,46 +30,46 @@ const getColorHex =  (color:string):string =>{
       <div class="Consiencia" style=" top: 3%;    width: 100%;    position: absolute;    height: 100%;">
         <div class="buttonbody absolute-center" style:top="15%">
           <input type="text" bind:value={Plate} class="buttontext absolute-right text-center text-subtitle1 text-uppercase text-black text-bold" />
-          <div  on:click="{getVehicleByPlate}" class="icon">
-            <img  src="iconos/search.png" class="absolute-right icon" style="left: 101%;width: 33px;top: 5%;border-radius: 10px;" />
+          <div on:click={getVehicleByPlate} class="icon">
+            <img src="iconos/search.png" class="absolute-right icon" style="left: 101%;width: 33px;top: 5%;border-radius: 10px;" />
           </div>
           <div class="text">
-            <span class="absolute-left" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Plate</span>
+            <span class="absolute-left customize" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Plate</span>
           </div>
         </div>
         <div class="separator absolute-center" style:top="22.5%" />
         <div class="buttonbody absolute-center" style:top="30%">
           <input type="text" bind:value={Owner} class="buttontext absolute-right text-center text-black text-bold text-h6 text-capitalize" />
           <div class="text">
-            <span class="absolute-left" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Owner</span>
+            <span class="absolute-left customize" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Owner</span>
           </div>
         </div>
         <div class="separator absolute-center" style:top="37.5%" />
         <div class="buttonbody absolute-center" style:top="45%">
-          <div class="buttontext absolute-right text-center" style:background={Color}  />
+          <div class="buttontext absolute-right text-center" style={'background:' + Color + ';'} />
           <div class="text">
-            <span class="absolute-left" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Color</span>
+            <span class="absolute-left customize" s>Color</span>
           </div>
         </div>
         <div class="separator absolute-center" style:top="52.5%" />
         <div class="buttonbody absolute-center" style:top="60%">
           <input disabled type="text" bind:value={VehicleName} class="buttontext absolute-right text-center text-capitalize text-black" />
           <div class="text">
-            <span class="absolute-left" style:font-size="18px" style:top="25%" style:color="white" style:left="5%">Vehicle Name</span>
+            <span class="absolute-left" style="left:5%;color:white;top:25%;font-size: 18px;">Vehicle Name</span>
           </div>
         </div>
         <div class="separator absolute-center" style:top="67.5%" />
         <div class="buttonbody absolute-center" style:top="75%">
           <input disabled type="text" bind:value={Brand} class="buttontext absolute-right text-center text-capitalize text-black" />
           <div class="text">
-            <span class="absolute-left" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Brand</span>
+            <span class="absolute-left customize" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Brand</span>
           </div>
         </div>
         <div class="separator absolute-center" style:top="82.5%" />
         <div class="buttonbody absolute-center" style:top="90%">
           <input disabled type="text" bind:value={Category} class="buttontext absolute-right text-center text-capitalize text-black" />
           <div class="text">
-            <span class="absolute-left" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Category</span>
+            <span class="absolute-left customize" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Category</span>
           </div>
         </div>
       </div>
@@ -76,13 +77,19 @@ const getColorHex =  (color:string):string =>{
     <div class="buttonactions absolute-bottom" style:color="white" style:bottom="3%" style:left="2.5%">
       <span class="absolute-center"> ADD BOLO </span>
     </div>
-    <div on:click="{() => push("/")}" class="buttonactions absolute-bottom" style:color="white" style:bottom="3%" style:left="71.5%">
-      <span class="absolute-center" > CERRAR </span>
+    <div on:click={() => push('/')} class="buttonactions absolute-bottom" style:color="white" style:bottom="3%" style:left="71.5%">
+      <span class="absolute-center"> CERRAR </span>
     </div>
   </div>
 </div>
 
 <style>
+  .customize {
+    left: 10%;
+    color: white;
+    top: 25%;
+    font-size: 18px;
+  }
   .my-back {
     background-color: rgba(255, 255, 55, 0.0001) !important;
   }
