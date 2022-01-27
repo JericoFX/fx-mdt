@@ -6,20 +6,18 @@ CreateThread(function()
     TriggerServerEvent("fx-mdt:server:GetPolicesOnDuty")
 end)
 RegisterNetEvent("fx-mdt:client:GetPolicesOnDuty",
-                 function(count, PolicesOnDuty)
-
-    OnDutyPolices = count
-    PoliceInfo = PolicesOnDuty
-    SendNUIMessage({
-        action = "onDutyPolices",
-        data = {policesOnDuty = OnDutyPolices, policesData = PoliceInfo}
-    })
-
-end)
+    function(count, PolicesOnDuty)
+        OnDutyPolices = count
+        PoliceInfo = PolicesOnDuty
+        SendNUIMessage({
+            action = "onDutyPolices",
+            data = {policesOnDuty = OnDutyPolices, policesData = PoliceInfo}
+        })
+    end)
 
 function OpenData()
     local Name = QBCore.Functions.GetPlayerData().charinfo.firstname .. " " ..
-                     QBCore.Functions.GetPlayerData().charinfo.lastname
+        QBCore.Functions.GetPlayerData().charinfo.lastname
     local Rank = QBCore.Functions.GetPlayerData().job.grade.name
     local OnDuty = QBCore.Functions.GetPlayerData().job.onduty
     SendNUIMessage({
@@ -49,18 +47,18 @@ RegisterNUICallback("TakePhoto", function(data, cb)
             break
         elseif IsControlJustPressed(1, 176) then -- TAKE.. PIC
             QBCore.Functions.TriggerCallback("fx-mdt:server:GetWebhook",
-                                             function(hook)
-                if hook then
-                    exports['screenshot-basic']:requestScreenshotUpload(
-                        tostring(hook), "files[]", function(data)
-                            local image = json.decode(data)
-                            cb(json.encode(image.attachments[1].proxy_url))
-                        end)
-                else
-                    return
-                end
-            end)
-            takePhoto = false
+                function(hook)
+                    if hook then
+                        exports['screenshot-basic']:requestScreenshotUpload(
+                            tostring(hook), "files[]", function(data)
+                                local image = json.decode(data)
+                                cb(json.encode(image.attachments[1].proxy_url))
+                            end)
+                    else
+                        return
+                    end
+                end)
+        takePhoto = false
         end
         HideHudComponentThisFrame(7)
         HideHudComponentThisFrame(8)
@@ -104,21 +102,26 @@ RegisterNUICallback("getClosesPlayerInfo", function(data, cb)
     if distance == -1 then cb(false) end
     if distance <= 3 then
         QBCore.Functions.TriggerCallback("fx-mdt:GetPlayerClosestInfo",
-                                         function(d) cb(d) end, Server)
+            function(d) cb(d) end, Server)
     end
 end)
 RegisterNUICallback("getPlayerSearch", function(data, cb)
     print(data.SearchName)
     local Name = tostring(data.SearchName)
     QBCore.Functions.TriggerCallback("fx-mdt:GetPlayerInfo",
-                                     function(d) cb(d) end, Name)
+        function(d) cb(d) end, Name)
 end)
 RegisterNUICallback("getReports", function(data, cb)
     QBCore.Functions.TriggerCallback("fx-mdt:server:GetReports",
-                                     function(d) cb(d) end, data.ID)
+        function(d) cb(d) end, data.ID)
 end)
 RegisterNUICallback("getEvidence", function(data, cb)
     QBCore.Functions.TriggerCallback("fx-mdt:server:GetEvidence",
-                                     function(d) cb(d) end)
-    -- Return the evidence!!!
+        function(d) cb(d) end)
+end)
+
+RegisterNUICallback("getVehicleData", function(data, cb)
+    local Plate = tostring(data.Plate)
+    QBCore.Functions.TriggerCallback("fx-mdt:server:GetVehicleData",
+        function(d) cb(d) end,Plate)
 end)

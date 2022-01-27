@@ -2,21 +2,35 @@
   import {createEventDispatcher} from 'svelte';
 import { push } from 'svelte-spa-router';
 import { fade } from 'svelte/transition';
+import { fetchNui } from '../../utils/fetchNui';
+import Colores from "../../utils/vehicle-colors"
   const dispatch = createEventDispatcher();
-  let Plate = "",Owner ="",Color = "",Brand="",Category = ""
-
+  $: Plate = ""
+  let Owner ="",Color = "",Brand="",Category = "",VehicleName =""
+const getVehicleByPlate =  () =>{
+  fetchNui("getVehicleData",{Plate}).then((cb) =>{
+    Owner = cb.Owner
+    Color = getColorHex(cb.Color),
+    Brand = cb.Brand,
+    VehicleName = cb.VehicleName,
+    Category = cb.Category
+  })
+}
+const getColorHex =  (color:string):string =>{
+  return Colores.filter(col => col.ID===color)[0].Hex
+}
 </script>
 
 <div class="modal-overlay" transition:fade={{duration: 100}}>
   <div class="my-back fit" />
   <div class="container absolute-center">
     <div class="body absolute-center">
-      <p class="absolute-center" style="top:10%;font-size:4rem">VEHICLES</p>
-      <div class="Consiencia" style=" top: 11%;    width: 100%;    position: absolute;    height: 100%;">
+      <p class="absolute-center" style="top:8%;font-size:4rem">VEHICLES</p>
+      <div class="Consiencia" style=" top: 3%;    width: 100%;    position: absolute;    height: 100%;">
         <div class="buttonbody absolute-center" style:top="15%">
           <input type="text" bind:value={Plate} class="buttontext absolute-right text-center text-black text-bold" />
-          <div class="icon">
-            <img src="iconos/search.png" class="absolute-right icon" style="left: 101%;width: 33px;top: 5%;border-radius: 10px;" />
+          <div  on:click="{getVehicleByPlate}" class="icon">
+            <img  src="iconos/search.png" class="absolute-right icon" style="left: 101%;width: 33px;top: 5%;border-radius: 10px;" />
           </div>
           <div class="text">
             <span class="absolute-left" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Plate</span>
@@ -31,20 +45,27 @@ import { fade } from 'svelte/transition';
         </div>
         <div class="separator absolute-center" style:top="37.5%" />
         <div class="buttonbody absolute-center" style:top="45%">
-          <div class="buttontext absolute-right text-center" />
+          <div class="buttontext absolute-right text-center" style:background={Color}  />
           <div class="text">
-            <span class="absolute-left" style:font-size="18px" style:top="25%" style:color="white" style:background={Color} style:left="10%">Color</span>
+            <span class="absolute-left" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Color</span>
           </div>
         </div>
         <div class="separator absolute-center" style:top="52.5%" />
         <div class="buttonbody absolute-center" style:top="60%">
+          <input disabled type="text" bind:value={VehicleName} class="buttontext absolute-right text-center" />
+          <div class="text">
+            <span class="absolute-left" style:font-size="18px" style:top="25%" style:color="white" style:left="5%">Vehicle Name</span>
+          </div>
+        </div>
+        <div class="separator absolute-center" style:top="67.5%" />
+        <div class="buttonbody absolute-center" style:top="75%">
           <input disabled type="text" bind:value={Brand} class="buttontext absolute-right text-center" />
           <div class="text">
             <span class="absolute-left" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Brand</span>
           </div>
         </div>
-        <div class="separator absolute-center" style:top="67.5%" />
-        <div class="buttonbody absolute-center" style:top="75%">
+        <div class="separator absolute-center" style:top="82.5%" />
+        <div class="buttonbody absolute-center" style:top="90%">
           <input disabled type="text" bind:value={Category} class="buttontext absolute-right text-center" />
           <div class="text">
             <span class="absolute-left" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Category</span>
@@ -130,7 +151,7 @@ import { fade } from 'svelte/transition';
     border-radius: 10px;
   }
   .buttonactions:hover {
-    box-shadow: 0px 4px 4px #000000;
+    box-shadow: 0px 4px 4px rgb(240, 3, 3);
   }
   .buttonactions:active {
     box-shadow: inset 0px 4px 4px #000000;

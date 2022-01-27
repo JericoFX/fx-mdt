@@ -236,8 +236,6 @@ QBCore.Functions.CreateCallback("fx-mdt:server:GetEvidence",
             end
         end
     end
-    SaveResourceFile(GetCurrentResourceName(), "data.json", json.encode(Blood),
-                     -1)
     cb(Blood)
 end)
 
@@ -245,3 +243,19 @@ function string.fromhex(str)
     return
         (str:gsub('..', function(cc) return string.char(tonumber(cc, 16)) end))
 end
+
+QBCore.Functions.CreateCallback("fx-mdt:server:GetVehicleData",function(source,cb,plate)
+local src = source
+local Placa = plate
+local Data = {}
+local result = exports.oxmysql:fetchSync("SELECT citizenid AS owner, JSON.EXTRACT(mods,'$.color1') AS color,vehicle FROM player_vehicles WHERE plate = ?",{Placa})[1]
+
+Data = {
+    Owner = result.owner,
+    Color = result.color,
+    VehicleName = result.vehice,
+    Category = QBCore.Shared.Vehicles[result.vehice].category,
+    Brand = QBCore.Shared.Vehicles[result.vehice].brand
+}
+cb(Data)
+end)
