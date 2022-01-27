@@ -129,8 +129,8 @@
 												<li>
 													<a on:click="{addClosePlayerInfo}" class="text-center">Closest Ped Info</a>
 												</li>
-												<li disabled={Name === "" ? true :false}>
-													<a on:click="{addReport}" disabled={Name === "" ? true :false} class="text-center">Add Report</a>
+												<li disabled={SearchName.length <= 2 ? true : false} >
+													<a on:click="{addReport}" disabled={SearchName.length <= 2 ? true : false}  class="text-center">Add Report</a>
 												</li>
 											</ul>
 										</div>

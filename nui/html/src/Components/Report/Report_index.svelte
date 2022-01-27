@@ -13,7 +13,6 @@
   const updateContainer = (id: number) => {
     container = id;
   };
-  $:console.log(JSON.stringify(params))
   let displayed = 'block';
   const Info = {
     ID: uuid4(),
@@ -37,6 +36,7 @@
       push('/');
     }, 500);
   };
+
   const addImage = () => {
     $IS_VISIBLE = false;
     fetchNui('TakePhoto').then((cb) => {
