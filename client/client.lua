@@ -114,13 +114,14 @@ RegisterNUICallback("getPlayerSearch", function(data, cb)
 end)
 RegisterNUICallback("getReports", function(data, cb)
         QBCore.Functions.TriggerCallback("fx-mdt:server:GetReports",function(d) 
+            
             cb(d) 
         end, data.ID)
 end)
 RegisterNUICallback("getEvidence", function(data, cb)
     QBCore.Functions.TriggerCallback("fx-mdt:server:GetEvidence",function(d) 
+     
         cb(d)
     end)
     -- Return the evidence!!!
 end)
-

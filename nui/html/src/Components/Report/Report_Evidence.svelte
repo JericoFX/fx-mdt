@@ -1,26 +1,26 @@
 <script lang="ts">
   import {fade, slide} from 'svelte/transition';
   import {fetchNui} from '../../utils/fetchNui';
-  import {createEventDispatcher, onMount} from 'svelte';
-import { push } from 'svelte-spa-router';
-  export let open = false;
+  import {createEventDispatcher} from 'svelte';
   const dispatch = createEventDispatcher();
+  export let open = false;
+  export let evidencias = [];
   let Evidence = [];
-onMount(() =>{
-  fetchNui('getEvidence').then((cb) => {
-    if (cb) {
-      Evidence = cb;
-      dispatch('sendEvidence', {Evidence});
-    }
-  });
-})
+  if (evidencias.length === 0) {
+    fetchNui('getEvidence').then((cb) => {
+      if (cb) {
+        Evidence = cb;
+        dispatch('sendEvidence', {Evidence});
+      }
+    });
+  } else {
+    Evidence = evidencias;
+  }
 
-const closeModal = () =>{
-  open = false
-  dispatch("closeModal")
-}
-
-
+  const closeModal = () => {
+    open = false;
+    dispatch('closeModal');
+  };
 </script>
 
 {#if open}
@@ -80,21 +80,22 @@ const closeModal = () =>{
         </div>
       </div>
     </div>
-    <div on:click="{closeModal}" class="buttonsito fixed-center" style:top="96.5%" style:width="228px" style:height="36px" style:border-radius="10px" style:background="#151415">
+    <div on:click={closeModal} class="buttonsito fixed-center" style:top="96.5%" style:width="228px" style:height="36px" style:border-radius="10px" style:background="#151415">
       <span class="text-center absolute-center">Close</span>
     </div>
   </div>
 {/if}
+
 <style>
-  .buttonsito{
-    box-shadow:0px 0px 0px #000000
+  .buttonsito {
+    box-shadow: 0px 0px 0px #000000;
   }
-  .buttonsito:hover{
+  .buttonsito:hover {
     transition: 0.1s;
-    box-shadow:0px 4px 4px #000000
+    box-shadow: 0px 4px 4px #000000;
   }
-  .buttonsito:active{
+  .buttonsito:active {
     transition: 0.1s;
-    box-shadow:inset 0px 4px 4px #000000
+    box-shadow: inset 0px 4px 4px #000000;
   }
 </style>

@@ -1,27 +1,46 @@
 <script lang="ts">
   import {push} from 'svelte-spa-router';
   import {fetchNui} from '../../utils/fetchNui';
-  import Report_Modal from "./Report_Modal.svelte"
+  import Report_Modal from './Report_Modal.svelte';
+  import Report_Evidence from '../Report/Report_Evidence.svelte';
   let Data = [];
-  let OpenModal = false
+  let OpenModal = false;
   fetchNui('getReports', {}).then((cb) => {
     if (cb) {
       Data = cb;
     }
   });
+  let puto = [
+    {type: 'casing', street: 'Sinner Street | Atlee Street', ammotype: 453432689, ammolabel: '9x19mm parabellum bullet'},
+    {type: 'casing', street: 'San Andreas Avenue | ', ammotype: 453432689, ammolabel: '9x19mm parabellum bullet'},
+    {type: 'blood', street: 'Atlee Street | ', dnalabel: '4c54583635303934', bloodtype: 'B-'},
+  ];
 
-  const openReportModal = (data: any) =>{
-    OpenModal = true
-    const Div = document.getElementById("id")
-    let m = new Report_Modal({target:Div,props:{
-      open:OpenModal,
-      data:data
-    }})
-    m.$on("closeReport",() =>{
-      OpenModal = false 
-    })
-    return m
-  }
+  const openReportModal = (data) => {
+    OpenModal = true;
+    const Div = document.getElementById('id');
+    let m = new Report_Modal({
+      target: Div,
+      props: {
+        open: OpenModal,
+        data: data,
+      },
+    });
+    m.$on('closeReport', () => {
+      OpenModal = false;
+    });
+    return m;
+  };
+
+  const getCurrentEvidence = (env) => {
+    const Div = document.getElementById('id');
+    OpenModal = true;
+    let m = new Report_Evidence({
+      target: Div,
+      props: {open: OpenModal, evidencias: env},
+    });
+    m.$on('closeModal', () => (OpenModal = false));
+  };
 </script>
 
 <div class="group_12_72_28 absolute-center">
@@ -36,6 +55,7 @@
             <th>Vehicle</th>
             <th>Information</th>
             <th>Imagenes</th>
+            <th>Evidencias</th>
           </tr>
         </thead>
         <tbody>
@@ -43,19 +63,22 @@
             <tr>
               <th>{players.name}</th>
               <td>{players.lastname}</td>
-              <td>{players.vehicleplate || "No Vehicle"}</td>
+              <td>{players.vehicleplate || 'No Vehicle'}</td>
               <td>{players.information}</td>
               <td on:click={() => openReportModal(players)} class="text-center"><button class="btn btn-sm"> Open Data</button></td>
-          </tr>
+              <td on:click={() => getCurrentEvidence(players.evidencias)} class="text-center"><button class="btn btn-sm"> Open Evidences</button></td>
+            </tr>
           {/each}
         </tbody>
       </table>
     </div>
   </div>
   <div on:click={() => push('/')} class="atras_71_14" />
+
   <div class="siguiente_71_20" />
 </div>
-<div id="id"></div>
+<div id="id" />
+
 <style>
   .group_12_72_28 {
     width: 991px;

@@ -25,6 +25,7 @@
             <th />
             <th>Name</th>
             <th>Last Name</th>
+            <th>CitizenID</th>
           </tr>
         </thead>
         <tbody>
@@ -33,6 +34,7 @@
               <th>-</th>
               <th>{pla.Name}</th>
               <th>{pla.LastName}</th>
+              <th>{pla.CitizenID}</th>
             </tr>
           {/each}
         </tbody>

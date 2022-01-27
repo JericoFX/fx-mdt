@@ -11,6 +11,7 @@
   let LastName= "";
   let JobName= "";
   let Rank= "";
+  let Citizenid = "";
   $Vehicles.length = 0
   const searchData = () => {
     $Vehicles.length = 0
@@ -31,6 +32,7 @@
           LastName = Dato.LastName.replaceAll('"', '');
           JobName = Dato.JobName.replaceAll('"', '');
           Rank = Dato.Rank.replaceAll('"', '');
+          Citizenid = Dato.CitizenID.replaceAll('"', '');
           $Vehicles = Dato.Vehicles
           openModal = false;
         });
@@ -68,6 +70,10 @@
           openModal = false;
         });
   }
+
+  const addReport = () =>{
+    push(`/Reports/${Name}/${LastName}/${Citizenid}`)
+  }
 </script>
 
 <div class="background fit fixed-center " transition:fade={{duration: 100}}>
@@ -86,8 +92,8 @@
             <li>
               <a on:click="{addClosePlayerInfo}" class="text-center">Closest Ped Info</a>
             </li>
-            <li>
-              <a class="text-center">Get Location</a>
+            <li disabled={Name === "" ? true :false}>
+              <a on:click="{addReport}" disabled={Name === "" ? true :false} class="text-center">Add Report</a>
             </li>
           </ul>
         </div>

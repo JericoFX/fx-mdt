@@ -1,6 +1,5 @@
 local QBCore = exports['qb-core']:GetCoreObject()
-local WebHook =
-    "https://discord.com/api/webhooks/894381817992454154/oBtR1Qb7z659kb_XXrZQWL84NJiWZ7cgi1fyg96kVMnF6QPtRQZVVTPdaNSCM6WX-GnR"
+local WebHook =""
 QBCore.Functions.CreateCallback("fx-mdt:GetPlayerClosestInfo",
                                 function(source, cb, id)
     local Player = QBCore.Functions.GetPlayer(id)
@@ -85,7 +84,7 @@ function GetAllReports(id)
                 location = element.location,
                 vehicleplate = element.vehicleplate,
                 information = element.information,
-                evidencia = element.evidencia,
+                evidencia = json.decode(element.evidencia),
                 imagenes = json.decode(element.imagenes)
             }
         end
@@ -102,8 +101,7 @@ function IsPolice(src)
     p:resolve(Player.PlayerData.job.name)
     return Citizen.Await(p)
 end
-QBCore.Functions.CreateCallback("fx-mdt:server:GetReports",
-                                function(source, cb, id)
+QBCore.Functions.CreateCallback("fx-mdt:server:GetReports", function(source, cb, id)
     print(source)
     if not id then
         cb(GetAllReports())
@@ -189,7 +187,7 @@ RegisterNetEvent("fx-mdt:server:InsertReport", function(data)
         "INSERT INTO fx_reports (id,citizenid,name,lastname,location,vehicleplate,information,evidencia,imagenes) VALUES (?,?,?,?,?,?,?,?,?)",
         {
             data.ID, data.citizenID, data.name, data.lastName, data.location,
-            data.vehiclePlate, data.information, data.evidencia,
+            data.vehiclePlate, data.information, json.encode(data.evidencia),
             json.encode(data.imagen)
         })
 
@@ -211,7 +209,6 @@ QBCore.Functions.CreateCallback("fx-mdt:server:GetEvidence",
     if Item then
         for k, v in ipairs(Item) do
             local element = Item[k]
-
             if element.info.type == "blood" then
                 local spl = string.fromhex(element.info.dnalabel)
                 Blood[#Blood + 1] = {
@@ -220,8 +217,9 @@ QBCore.Functions.CreateCallback("fx-mdt:server:GetEvidence",
                     bloodtype = element.info.bloodtype,
                     dnalabel = element.info.dnalabel
                 }
-            else if element.info.type == "casing" then
-                Blood[#Blood + 1] = {
+            else
+                if element.info.type == "casing" then
+                    Blood[#Blood + 1] = {
                         type = element.info.type,
                         street = element.info.street,
                         ammotype = element.info.ammotype,
@@ -232,7 +230,8 @@ QBCore.Functions.CreateCallback("fx-mdt:server:GetEvidence",
             end
         end
     end
-cb(Blood)
+    SaveResourceFile(GetCurrentResourceName(), "data.json", json.encode(Blood), -1)
+    cb(Blood)
 end)
 
 function string.fromhex(str)

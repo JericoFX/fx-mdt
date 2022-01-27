@@ -7,8 +7,9 @@ export default{
   "/Members":wrap({
     component:Members
   }),
-  "/Reports":wrap({
-    component:Warrants
+  "/Reports/:Name?/:last?/:CitizenID?":wrap({
+    component:Warrants,
+
   }),
   "/Search":wrap({
     component:Report
