@@ -151,7 +151,7 @@ const getColorHex =  (color:string):string =>{
     border-radius: 10px;
   }
   .buttonactions:hover {
-    box-shadow: 0px 4px 4px rgb(240, 3, 3);
+    box-shadow: 0px 4px 4px #000000;
   }
   .buttonactions:active {
     box-shadow: inset 0px 4px 4px #000000;
