@@ -6,7 +6,9 @@
   import {v4 as uuid4} from 'uuid';
   import {IS_VISIBLE} from '../../store/store';
   import {fetchNui} from '../../utils/fetchNui';
+  import Report_Evidence from "./Report_Evidence.svelte"
   $: container = 1;
+  let Open = false
   const updateContainer = (id: number) => {
     container = id;
   };
@@ -20,7 +22,7 @@
     vehicleIsinvolved: false,
     vehiclePlate: '',
     information: '',
-    evidencia: '',
+    evidencia: [],
     imagen: []
   };
   let Data = []
@@ -61,13 +63,21 @@
     });
    
   }
-  const getCurrentEvidence = () =>{
-    fetchNui('getEvidence').then((cb) => {
-      if (cb) {
-        Data = cb
-      }
-    });
-  }
+const getCurrentEvidence = () =>{
+  const Div = document.getElementById("id")
+  Open = true
+  let m = new Report_Evidence({
+    target:Div,
+    props:{open:
+      Open}
+  })
+  m.$on("sendEvidence",(Evidence:any) =>{
+    Info.evidencia = Evidence
+    Open = false
+  })
+  m.$on("closeModal",() => Open = false)
+  return m
+}
 </script>
 <div style="{"display:" + displayed}">
 
@@ -86,7 +96,7 @@
         <a  on:click="{addCurrentLocation}" >Current Location</a>
       </li>
       <li>
-        <a  on:click="{getCurrentEvidence}" >Add Evidence</a>
+        <a  on:click="{getCurrentEvidence}" >View Evidence</a>
       </li> 
     </ul>
   </div>
@@ -164,7 +174,7 @@
               <span class="evidencia">Evidencia</span>
               <textarea bind:value={Info.information} class="rectangle_21 text-black text-h6" name="asd" id="" cols="2" rows="12" />
               <!-- <div class="rectangle_21" /> -->
-              <div class="rectangle_24 scroll hide-scrollbar">
+              <!-- <div class="rectangle_24 scroll hide-scrollbar">
                 <table class="table fit table-zebra">
                   <thead>
                     <tr>
@@ -183,9 +193,16 @@
                     {/each}
                   </tbody>
                 </table>
-              </div>
+              </div> -->
               
               <!-- <textarea bind:value={Info.evidencia} class="rectangle_24 text-black text-h6" name="asd" id="" cols="2" rows="12" /> -->
+              <div on:click="{getCurrentEvidence}" class="button" style="  width: 228px;
+              height: 37px;
+              position: absolute;
+              left: 25%;
+              top: 80%;background:#0A0A0B;border-radius:10px;">
+                <span class="absolute-center"> View Evidence </span>
+              </div>
             </div>
           </div>
         </div>
@@ -238,6 +255,7 @@
   </div>
 </div>
 </div>
+<div id="id"></div>
 <style>
   :root{
     --as-toast-border: 1px solid rgba(209, 213, 219, 0.3);
