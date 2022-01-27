@@ -1,5 +1,6 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local WebHook =""
+
 QBCore.Functions.CreateCallback("fx-mdt:GetPlayerClosestInfo",
                                 function(source, cb, id)
     local Player = QBCore.Functions.GetPlayer(id)
@@ -23,7 +24,6 @@ RegisterNetEvent("fx-mdt:server:GetPolicesOnDuty", function(source)
     local PolicesOnDuty, count = QBCore.Functions.GetPlayersOnDuty("police")
     local Players = {}
     local players = GetPolicesOnD()
-
     for src, Player in pairs(QBCore.Functions.GetQBPlayers()) do
         if Player.PlayerData.job.name == "police" then
             if Player then
@@ -63,15 +63,15 @@ function GetPolicesOnD()
     return Citizen.Await(p)
 end
 
-function GetAllReports(id)
-
+function GetAllReports(tipo, id)
     local Data = {}
     local reports
+    print(tipo, id)
     if id then
         reports = exports.oxmysql:fetchSync(
-                      "SELECT id,citizenid,name,lastname,location,vehicleplate,information,evidencia, imagenes FROM fx_reports WHERE id = ?",
+                      "SELECT id,citizenid,name,lastname,location,vehicleplate,information,evidencia, imagenes FROM fx_reports WHERE citizenid = ?",
                       {id})
-
+        return reports
     else
         reports = exports.oxmysql:fetchSync(
                       "SELECT id,citizenid,name,lastname,location,vehicleplate,information,evidencia, imagenes  FROM fx_reports")
@@ -101,7 +101,8 @@ function IsPolice(src)
     p:resolve(Player.PlayerData.job.name)
     return Citizen.Await(p)
 end
-QBCore.Functions.CreateCallback("fx-mdt:server:GetReports", function(source, cb, id)
+QBCore.Functions.CreateCallback("fx-mdt:server:GetReports",
+                                function(source, cb, id)
     print(source)
     if not id then
         cb(GetAllReports())
@@ -124,48 +125,53 @@ function GetVehicleModsInfo(id)
 end
 
 RegisterCommand("getsql", function(source, args)
-    local players = exports.oxmysql:fetchSync(
-                        "UPDATE player_vehicles SET mods = JSON_REPLACE(mods,'$.engineHealth',?,'$.bodyHealth',?,'$.fuelLevel',?) WHERE plate = ?",
-                        {100.1, 100.1, 100.1, "25HMB316"})
+    local Data = GetAllReports("citizenid", "FQI55932")
+    QBCore.Debug(Data)
+    -- local players = exports.oxmysql:fetchSync(
+    --     "UPDATE player_vehicles SET mods = JSON_REPLACE(mods,'$.engineHealth',?,'$.bodyHealth',?,'$.fuelLevel',?) WHERE plate = ?",
+    --     {100.1, 100.1, 100.1, "25HMB316"}) -- Replace Data without taking the time to decode and encode again
 
     -- SELECT JSON_REPLACE(mods, '$.engineHealth', 9) AS 'Result' FROM player_vehicles WHERE plate = "25HMB316"
 end)
 QBCore.Functions.CreateCallback("fx-mdt:GetPlayerInfo", function(source, cb, id)
     local Data = {}
-    exports.oxmysql:fetch(
-        "SELECT citizenid,JSON_EXTRACT(players.charinfo,'$.firstname') AS firstname,JSON_EXTRACT(players.charinfo,'$.lastname') AS lastname, JSON_EXTRACT(players.job,'$.grade.name') AS rank ,JSON_EXTRACT(players.job,'$.name') AS jobname, JSON_EXTRACT(players.charinfo,'$.phone') AS phone, JSON_EXTRACT(players.job,'$.payment') AS payment FROM `players` WHERE `charinfo` LIKE ? ",
-        {string.lower('%' .. id .. '%')}, function(result)
 
-            for k, v in pairs(result) do
-                local PlayerOnline = QBCore.Functions.GetPlayer(result[k]
-                                                                    .citizenid)
-                local result1 = GetVehicleModsInfo(result[k].citizenid)
-                if PlayerOnline then
-                    Data[#Data + 1] = {
-                        Name = PlayerOnline.PlayerData.charinfo.firstname,
-                        LastName = PlayerOnline.PlayerData.charinfo.lastname,
-                        CitizenID = PlayerOnline.PlayerData.citizenid,
-                        Rank = PlayerOnline.PlayerData.job.grade.name,
-                        JobName = PlayerOnline.PlayerData.job.name,
-                        Payment = PlayerOnline.PlayerData.job.payment,
-                        Phone = PlayerOnline.PlayerData.charinfo.phone,
-                        Vehicles = result1
-                    }
-                else
-                    Data[#Data + 1] = {
-                        Name = result[k].firstname,
-                        LastName = result[k].lastname,
-                        CitizenID = result[k].citizenid,
-                        Rank = result[k].rank,
-                        JobName = result[k].jobname,
-                        Payment = result[k].payment,
-                        Phone = result[k].phone,
-                        Vehicles = result1
-                    }
-                end
+    exports.oxmysql:fetch("SELECT citizenid,JSON_EXTRACT(players.charinfo,'$.firstname') AS firstname, JSON_EXTRACT(players.charinfo,'$.lastname') AS lastname,JSON_EXTRACT(players.job,'$.grade.name') AS rank ,JSON_EXTRACT(players.job,'$.name') AS jobname, JSON_EXTRACT(players.charinfo,'$.phone') AS phone,  JSON_EXTRACT(players.job,'$.payment') AS payment FROM players  WHERE players.charinfo LIKE ? ", {string.lower('%' .. id .. '%')}, function(result)
+        for k, v in pairs(result) do
+            local PlayerOnline = QBCore.Functions.GetPlayer(result[k].citizenid)
+            local result1 = GetVehicleModsInfo(result[k].citizenid)
+               local Cases = GetAllReports(result[k].citizenid)
+            local Houses = exports.oxmysql.fetchSync("SELECT house FROM player_houses WHERE citizenid = ?",{result[k].citizenid})
+            if PlayerOnline then
+                Data[#Data + 1] = {
+                    Name = PlayerOnline.PlayerData.charinfo.firstname,
+                    LastName = PlayerOnline.PlayerData.charinfo.lastname,
+                    CitizenID = PlayerOnline.PlayerData.citizenid,
+                    Rank = PlayerOnline.PlayerData.job.grade.name,
+                    JobName = PlayerOnline.PlayerData.job.name,
+                    Payment = PlayerOnline.PlayerData.job.payment,
+                    Phone = PlayerOnline.PlayerData.charinfo.phone,
+                    Vehicles = result1,
+                    Houses = Houses
+
+                }
+            else
+                Data[#Data + 1] = {
+                    Name = result[k].firstname,
+                    LastName = result[k].lastname,
+                    CitizenID = result[k].citizenid,
+                    Rank = result[k].rank,
+                    JobName = result[k].jobname,
+                    Payment = result[k].payment,
+                    Phone = result[k].phone,
+                    Vehicles = result1,
+                    Houses = Houses,
+                    Casos = Cases
+                }
             end
-            cb(Data)
-        end)
+        end
+        cb(Data)
+    end)
 
 end)
 
@@ -230,7 +236,8 @@ QBCore.Functions.CreateCallback("fx-mdt:server:GetEvidence",
             end
         end
     end
-    SaveResourceFile(GetCurrentResourceName(), "data.json", json.encode(Blood), -1)
+    SaveResourceFile(GetCurrentResourceName(), "data.json", json.encode(Blood),
+                     -1)
     cb(Blood)
 end)
 

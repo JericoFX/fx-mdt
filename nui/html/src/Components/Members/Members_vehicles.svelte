@@ -59,7 +59,7 @@
         </div>
         <div  class="absolute-left" style="top:80%;left:20%;">
           <div class="button drop-shadow-md hover:drop-shadow-xl active:invert drop-shadow-xl  absolute-center">
-            <p class="absolute-center text-uppercase botoncerrar" style="color:white">Add Report</p>
+            <p class="absolute-center text-uppercase botoncerrar" style="color:white">Add Bolo</p>
           </div>
         </div>
         <div on:click="{sendData}" class="absolute-right" style="top:80%;right:20%;">
