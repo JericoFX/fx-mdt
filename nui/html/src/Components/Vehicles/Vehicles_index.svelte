@@ -28,7 +28,7 @@ const getColorHex =  (color:string):string =>{
       <p class="absolute-center" style="top:8%;font-size:4rem">VEHICLES</p>
       <div class="Consiencia" style=" top: 3%;    width: 100%;    position: absolute;    height: 100%;">
         <div class="buttonbody absolute-center" style:top="15%">
-          <input type="text" bind:value={Plate} class="buttontext absolute-right text-center text-black text-bold" />
+          <input type="text" bind:value={Plate} class="buttontext absolute-right text-center text-subtitle1 text-uppercase text-black text-bold" />
           <div  on:click="{getVehicleByPlate}" class="icon">
             <img  src="iconos/search.png" class="absolute-right icon" style="left: 101%;width: 33px;top: 5%;border-radius: 10px;" />
           </div>
@@ -38,7 +38,7 @@ const getColorHex =  (color:string):string =>{
         </div>
         <div class="separator absolute-center" style:top="22.5%" />
         <div class="buttonbody absolute-center" style:top="30%">
-          <input type="text" bind:value={Owner} class="buttontext absolute-right text-center text-black text-bold" />
+          <input type="text" bind:value={Owner} class="buttontext absolute-right text-center text-black text-bold text-h6 text-capitalize" />
           <div class="text">
             <span class="absolute-left" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Owner</span>
           </div>
@@ -52,21 +52,21 @@ const getColorHex =  (color:string):string =>{
         </div>
         <div class="separator absolute-center" style:top="52.5%" />
         <div class="buttonbody absolute-center" style:top="60%">
-          <input disabled type="text" bind:value={VehicleName} class="buttontext absolute-right text-center" />
+          <input disabled type="text" bind:value={VehicleName} class="buttontext absolute-right text-center text-capitalize text-black" />
           <div class="text">
             <span class="absolute-left" style:font-size="18px" style:top="25%" style:color="white" style:left="5%">Vehicle Name</span>
           </div>
         </div>
         <div class="separator absolute-center" style:top="67.5%" />
         <div class="buttonbody absolute-center" style:top="75%">
-          <input disabled type="text" bind:value={Brand} class="buttontext absolute-right text-center" />
+          <input disabled type="text" bind:value={Brand} class="buttontext absolute-right text-center text-capitalize text-black" />
           <div class="text">
             <span class="absolute-left" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Brand</span>
           </div>
         </div>
         <div class="separator absolute-center" style:top="82.5%" />
         <div class="buttonbody absolute-center" style:top="90%">
-          <input disabled type="text" bind:value={Category} class="buttontext absolute-right text-center" />
+          <input disabled type="text" bind:value={Category} class="buttontext absolute-right text-center text-capitalize text-black" />
           <div class="text">
             <span class="absolute-left" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Category</span>
           </div>
