@@ -20,6 +20,9 @@
   const getColorHex = (color: string): string => {
     return Colores.filter((col) => col.ID === color.toString())[0].Hex;
   };
+  const addBolo = () =>{
+    
+  }
 </script>
 
 <div class="modal-overlay" transition:fade={{duration: 100}}>
@@ -74,7 +77,7 @@
         </div>
       </div>
     </div>
-    <div class="buttonactions absolute-bottom" style:color="white" style:bottom="3%" style:left="2.5%">
+    <div on:click={addBolo} class="buttonactions absolute-bottom" style:color="white" style:bottom="3%" style:left="2.5%">
       <span class="absolute-center"> ADD BOLO </span>
     </div>
     <div on:click={() => push('/')} class="buttonactions absolute-bottom" style:color="white" style:bottom="3%" style:left="71.5%">

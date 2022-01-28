@@ -15,8 +15,10 @@
   const APP = [
     {name: 'Members', icon: 'iconos/people.png'},
     {name: 'Vehicles', icon: 'iconos/sedan.png'},
+    {name: 'VehiclesBolo', icon: 'iconos/analyze.png'},
     {name: 'Reports', icon: 'iconos/browse_page.png'},
     {name: 'Search', icon: 'iconos/analyze.png'},
+
   ];
   const handleClick = (name: string) => {
     push(`/${name}`);
@@ -52,7 +54,7 @@
         class="fixed-center q-mb-lg"
         style="display: flex;
       flex-direction: row;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
       align-content: space-between;
        justify-content: center;
       align-items: stretch;width:100%;"

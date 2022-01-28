@@ -24,7 +24,7 @@
 </script>
 
 {#if open}
-  <div class="container absolute-center" style:width="991px" style:height="584px" style:background="#343441" style:box-shadow="0px 4px 4px #000000" style:border-radius="10px">
+  <div class="container absolute-center" style="z-index:10001" style:width="991px" style:height="584px" style:background="#343441" style:box-shadow="0px 4px 4px #000000" style:border-radius="10px">
     <div
       class="centerContainer absolute-center"
       style="width: 85%;

@@ -6,15 +6,17 @@
   import {v4 as uuid4} from 'uuid';
   import {IS_VISIBLE} from '../../store/store';
   import {fetchNui} from '../../utils/fetchNui';
-  import Report_Evidence from './Report_Evidence.svelte';
+  import Fines from '../Fines/Fines_modal.svelte';
+  import fines from '../../utils/fines';
   $: container = 1;
   let Open = false;
   export let params = {};
   const updateContainer = (id: number) => {
     container = id;
   };
+  let open = false;
   let displayed = 'block';
-  const Info = {
+  let Info = {
     ID: uuid4(),
     name: '',
     lastName: '',
@@ -25,8 +27,10 @@
     information: '',
     evidencia: [],
     imagen: [],
+    fines: [],
+    polices: [],
   };
-  let block = false
+  let block = false;
   let locationblock = false;
   const sendData = () => {
     fetchNui('sendVehicleData', {Info}).then((cb) => {
@@ -50,9 +54,9 @@
     Info.name = params.Name;
     Info.lastName = params.last;
     Info.citizenID = params.CitizenID;
-    block = true
+    block = true;
   } else {
-    block = false
+    block = false;
   }
 
   const addClosePlayerInfo = () => {
@@ -72,34 +76,57 @@
       }
     });
   };
-  const getCurrentEvidence = () => {
+
+  fetchNui('getEvidence').then((cb) => {
+    if (cb) {
+      Info.evidencia = cb;
+    }
+  });
+
+  const openFineModal = () => {
+    open = true;
     const Div = document.getElementById('id');
-    Open = true;
-    let m = new Report_Evidence({
+    let m = new Fines({
       target: Div,
-      props: {open: Open},
+      props: {
+        open: open,
+      },
     });
-    m.$on('sendEvidence', (data: any) => {
-      Info.evidencia = data.detail.Evidence;
-      Open = false;
+    m.$on('sendFines', (fines) => {
+      const Fin = fines.detail.FinesAdded;
+      Info.fines.push(Fin)
+      Info.fines[0] = Info.fines[0]
     });
-    m.$on('closeModal', () => (Open = false));
-    return m;
   };
+  const deteFromArray = (id: any) => {
+    Info.fines.splice(
+      Info.fines.findIndex((e) => e.id === id),
+      1
+    );
+    Info.fines = Info.fines;
+  };
+  $: amount = 0;
+  $: jailTime = 0;
+  $: if (Info.fines.length > 1) {
+    amount = Info.fines.reduce(function (acc, obj) {
+      return acc + obj.amount;
+    }, 0);
+  }
+  $: if (Info.fines.length > 1) {
+    jailTime = Info.fines.reduce(function (acc, obj) {
+      return acc + obj.jailtime;
+    }, 0);
+  }
+  $: if (Info.fines.length === 0) {
+    amount = 0;
+    jailTime = 0;
+  }
 </script>
 
-<div style={'display:' + displayed}>
-    <div class="modal-overlay" transition:fade={{duration: 100}}>
-    <div class="my-back fit" />
-  <div class="fixed-center container">
-    <div
-      tabindex="0"
-      class="dropdown absolute-top-right"
-      style="position:absolute;width: 37px;
-  height: 33px;background: #343441;
-  box-shadow: 0px 4px 4px #000000;
-  border-radius: 25px;top:3%;right:2%;"
-    >
+<div class="container fixed-center">
+  <div class="body fixed-center" style="width:90%;height:85%;top:47%; background: #151415;border-radius: 10px;">
+    <!-- TOP MENU -->
+    <div tabindex="0" class="dropdown absolute-top-right" style="position:absolute;width: 37px;height: 33px;background: #343441;box-shadow: 0px 4px 4px #000000;border-radius: 25px;top:3%;right:2%;z-index:10;">
       <ul tabindex="0" class="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52">
         <li disabled={block}>
           <a on:click={addClosePlayerInfo} class="text-center">Closest Ped Info</a>
@@ -107,138 +134,230 @@
         <li>
           <a on:click={addCurrentLocation}>Current Location</a>
         </li>
-        <li>
-          <a on:click={getCurrentEvidence}>View Evidence</a>
-        </li>
       </ul>
     </div>
-
-    <div class="absolute-bottom" style:bottom={'11%'}>
+    <!-- TOP MENU -->
+    <!-- step Bar -->
+    <div class="absolute-bottom" style:bottom={'1%'}>
       <ul class="w-full steps">
         <li class="step step-primary">Basic Data</li>
         <li class="step" class:step-primary={container >= 2}>Additional Info</li>
-        <li class="step" class:step-primary={container > 2}>End</li>
+        <li class="step" class:step-primary={container >= 3}>Images</li>
+        <li class="step" class:step-primary={container >= 4}>End</li>
       </ul>
     </div>
-
-    <div class="bodyshape absolute-center">
+    <!-- step Bar -->
+    <!-- Name -->
+    <div class="infobars" style="top: 11%;width: 100%;height: 100%;position: absolute;">
       <StepWizard initialStep={1}>
         <StepWizard.Step num={1} let:nextStep>
-          <div in:fade out:slide>
-            <!--Name -->
-            <div class="name absolute-center" style="top:10%;">
-              <div class="containers fixed-right" />
-              <span class="name1 absolute-left" style:left={'6%'}>Name</span>
-              <div class="background fixed-right" />
-              <input bind:value={Info.name} type="text" class="inputs fixed-right text-black text-h6" />
+          <div class="step-1">
+            <div id="Name" class="absolute-center buttonshape" style="top: 10%;">
+              <span class="text-h5 absolute-left" style="top: 17%;left: 1%;">Name</span>
+              <input bind:value={Info.name} type="text" id="textname" class="text-area   absolute-right text-center text-capitalize text-black" />
             </div>
-            <!-- 		Last Name -->
-            <div class="name absolute-center" style="top:30%;">
-              <div class="containers fixed-right" />
-              <span class="name1 absolute-left" style:left={'2%'}>Last Name</span>
-              <div class="background fixed-right" />
-              <input bind:value={Info.lastName} type="text" class="inputs fixed-right text-black text-h6" />
+            <!-- Last Name -->
+            <div id="LastName" class="absolute-center buttonshape" style="top: 25%;">
+              <span class="text-h5 absolute-left" style="top: 17%;left: 1%;">Last Name</span>
+              <input bind:value={Info.lastName} type="text" id="textlastname" class="text-area   absolute-right text-center text-capitalize text-black" />
             </div>
-            <!-- 		CitizenID -->
-            <div class="name absolute-center" style="top:50%;">
-              <div class="containers fixed-right" />
-              <span class="name1 absolute-left" style:left={'14%'}>ID</span>
-              <div class="background fixed-right" />
-              <input bind:value={Info.citizenID} type="text " class="inputs fixed-right text-black text-h6" />
+            <!-- CitizenID -->
+            <div id="CitizenID" class="absolute-center buttonshape" style="top: 40%;">
+              <span class="text-h5 absolute-left" style="top: 17%;left: 1%;">CitizenID</span>
+              <input bind:value={Info.citizenID} type="text" id="textcitizenid" class="text-area absolute-right text-center text-uppercase text-bold text-black " />
             </div>
-            <!-- 		location -->
-            <div class="name absolute-center" style="top:70%;">
-              <div class="containers fixed-right" />
-              <span class="name1 absolute-left" style:left={'6%'}>Location</span>
-              <div class="background fixed-right" />
-              <input disabled={locationblock} bind:value={Info.location} type="text " class="inputs fixed-right text-black text-h6" />
+            <!-- Location -->
+            <div id="LastName" class="absolute-center buttonshape" style="top: 55%;">
+              <span class="text-h5 absolute-left" style="top: 17%;left: 1%;">Location</span>
+              <input bind:value={Info.location} type="text" id="textlocation" class="text-area  absolute-right text-center text-capitalize text-black" />
             </div>
-            <!--Vehicle Involved -->
-
-            <div class="vehicle absolute-center" style="top:90%;">
-              <div class="body fixed-right"><span class="vehicle_involved" style="top:1%;font-size:12px;">Vehicle Involved</span></div>
+            <!-- Location -->
+            <div id="LastName" class="absolute-center buttonshape" style="top: 55%;">
+              <span class="text-h6 absolute-left" style="top: 17%;left: 1%;">Vehicle Involved</span>
               <input bind:checked={Info.vehicleIsinvolved} type="checkbox" class="checkbox " />
-
-              <input disabled={!Info.vehicleIsinvolved} bind:value={Info.vehiclePlate} type="text " class="inputs fixed-right text-center  text-black text-h6" style="width:204px;height:35px;" />
+              <input bind:value={Info.vehiclePlate} disabled={!Info.vehicleIsinvolved} type="text" id="text-vehicle" class="text-area  absolute-right text-center text-uppercase text-black" style="width:66%" />
+            </div>
+            <!-- INFO BARS -->
+            <div class="buttonBack absolute-bottom no-input fixed-bottom" style="left:1%;bottom:1%;" on:click={() => push('/')}>
+              <span class="absolute-center text-center" style:font-size="2rem">Exit</span>
+            </div>
+            <div on:click={() => updateContainer(2)} on:click={nextStep} class="buttonBack absolute-bottom" style="left:74.5%;bottom:1%;">
+              <span class="absolute-center text-center" style:font-size="2rem">Next</span>
             </div>
           </div>
-          <div class="buttonBack no-input fixed-bottom" on:click={() => push('/')}>
-            <span class="absolute-center text-center" style:font-size="2rem">Exit</span>
-          </div>
-          <div on:click={() => updateContainer(2)} on:click={nextStep} class="buttonNext fixed-bottom">
-            <span class="absolute-center text-center" style:font-size="2rem">Next</span>
-          </div>
         </StepWizard.Step>
-        <!--2 Place -->
         <StepWizard.Step num={2} let:previousStep let:nextStep>
-          <div in:fade out:slide>
-            <div class="group_11">
-              <div class="bodyapp" />
-              <div class="id">
-                <div class="rectangle_19" />
-                <div class="rectangle_20" />
-                <span class="information">Information</span>
-                <div class="rectangle_22" />
-                <div class="rectangle_23" />
-                <div class="rectangle_25" />
-                <span class="evidencia">Evidencia</span>
-                <textarea bind:value={Info.information} class="rectangle_21 text-black text-h6" name="asd" id="" cols="2" rows="12" />
-                <div
-                  on:click={getCurrentEvidence}
-                  class="button"
-                  style="  width: 228px;
-              height: 37px;
-              position: absolute;
-              left: 25%;
-              top: 80%;background:#0A0A0B;border-radius:10px;"
-                >
-                  <span class="absolute-center"> View Evidence </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="buttonBack fixed-bottom" on:click={() => updateContainer(1)} on:click={previousStep}>
-            <span class="absolute-center text-center" style:font-size="2rem">Back</span>
-          </div>
-          <div class="buttonNext fixed-bottom" on:click={() => updateContainer(3)} on:click={nextStep}>
-            <span class="absolute-center text-center" style:font-size="2rem">Next</span>
-          </div>
-        </StepWizard.Step>
-        <StepWizard.Step num={3} let:previousStep>
-          <div in:fade out:slide>
-            <div class="id_60_164 absolute-top">
-              <div class="rectangle_19_60_165 absolute-top">
-                <div class="rectangle_20_60_166 absolute-center">
-                  <span class="imagenes_60_167 absolute-center">Imagenes</span>
-                </div>
-              </div>
+          <div class="step-2">
+            <div class="infocontainer absolute-center" style="top:-1%;">
+              <!-- INFORMATION TITLE  -->
               <div
-                class="absolute-center scroll hide-scrollbar"
-                style="position: absolute;width: 80%;
-            top: 59%;
-            left: 45%;
-            height: 81%;
-            background: rgb(52, 52, 65);
-            box-shadow: rgb(0, 0, 0) 0px 4px 4px inset;
-            border-radius: 25px;"
+                class="infobody absolute-center"
+                style="position: absolute;
+              width: 491.23px;
+              height: 29.77px;
+              background: #343441;
+              box-shadow: inset 0px 4px 4px #000000;
+              border-radius: 25px;"
               >
-                <div class="full-width">
-                  {#each Info.imagen as img}
-                    <div class="q-mt-md shadow-1">
-                      <img class="q-mt-md shadow-1" src={img} alt="as" srcset="" />
-                    </div>
-                  {/each}
-                </div>
+                <span class="text-h5 text-center absolute-center text-white">Information</span>
               </div>
             </div>
-            <div on:click={addImage} class="buttonBack1 fixed-bottom">
-              <span class="absolute-center text-center" style:font-size="1.5rem">Add Image</span>
+            <!-- INFORMATION TEXT  -->
+            <textarea bind:value={Info.information} id="" cols="2" rows="12" type="textarea" class="absolute-center areatexto text-black text-h5" />
+            <!-- EVIDENCIAS -->
+            <div class="evidencetab absolute-center" style:top="55%">
+              <div class="overflow-x-auto fit">
+                <table class="table full-width">
+                  <thead>
+                    <tr>
+                      <th>Detail</th>
+                      <th>Location</th>
+                      <th>Type</th>
+                      <th>Label</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {#each Info.evidencia as env}
+                      <tr>
+                        <td>
+                          <div class="flex items-center space-x-3">
+                            <div class="avatar">
+                              <div class="w-12 h-12 mask mask-squircle">
+                                <img src={env.type === 'blood' ? 'iconos/blood.png' : 'iconos/ammo.png'} style:width="42px" alt={env.type} />
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td>{env.street}</td>
+                        <th class="text-center"> <span class="badge">{env.type === 'blood' ? env.bloodtype : env.ammotype}</span></th>
+                        <th class="text-center">
+                          {env.type === 'blood' ? env.dnalabel : env.ammolabel}
+                        </th>
+                      </tr>
+                    {/each}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <th>Detail</th>
+                      <th>Location</th>
+                      <th>Type</th>
+                      <th>Label</th>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
             </div>
-            <div class="buttonBack fixed-bottom" on:click={() => updateContainer(2)} on:click={previousStep}>
+            <!-- INFO BARS -->
+            <div on:click={() => updateContainer(1)} class="buttonBack absolute-bottom no-input fixed-bottom" style="left:1%;bottom:1%;" on:click={previousStep}>
               <span class="absolute-center text-center" style:font-size="2rem">Back</span>
             </div>
-            <div class="buttonNext fixed-bottom" on:click={() => updateContainer(3)} on:click={sendData}>
-              <span class="absolute-center text-center" style:font-size="2rem">Finish</span>
+            <div on:click={() => updateContainer(3)} on:click={nextStep} class="buttonBack absolute-bottom" style="left:74.5%;bottom:1%;">
+              <span class="absolute-center text-center" style:font-size="2rem">Next</span>
+            </div>
+          </div>
+        </StepWizard.Step>
+        <StepWizard.Step num={3} let:previousStep let:nextStep>
+          <div class="step-3">
+            <div class="infocontainer absolute-center" style="top:-1%;">
+              <!-- INFORMATION TITLE  -->
+              <div
+                class="infobody absolute-center"
+                style="position: absolute;
+              width: 491.23px;
+              height: 29.77px;
+              background: #343441;
+              box-shadow: inset 0px 4px 4px #000000;
+              border-radius: 25px;"
+              >
+                <span class="text-h5 text-center absolute-center text-white">Take Pictures</span>
+              </div>
+            </div>
+
+            <div class="imagesholder absolute-center scroll hide-scrollbar">
+              <div class="full-width">
+                {#each Info.imagen as img}
+                  <div class="q-mt-md shadow-1">
+                    <img class="q-mt-md shadow-1" src={img} alt="as" srcset="" />
+                  </div>
+                {/each}
+              </div>
+            </div>
+            <div class="botonsito absolute-center" style="position: absolute;width: 228px;height: 37px;background: #343441;top:72%;border-radius: 10px;">
+              <span class="absolute-center">Take Picture</span>
+            </div>
+            <div on:click={() => updateContainer(2)} class="buttonBack absolute-bottom no-input fixed-bottom" style="left:1%;bottom:1%;" on:click={previousStep}>
+              <span class="absolute-center text-center" style:font-size="2rem">Back</span>
+            </div>
+
+            <div on:click={() => updateContainer(4)} on:click={nextStep} class="buttonBack absolute-bottom" style="left:74.5%;bottom:1%;">
+              <span class="absolute-center text-center" style:font-size="2rem">Next</span>
+            </div>
+          </div>
+        </StepWizard.Step>
+        <StepWizard.Step num={4} let:previousStep let:nextStep>
+          <div class="step-4">
+            <div class="infocontainer absolute-center" style="top:-1%;">
+              <!-- INFORMATION TITLE  -->
+              <div
+                class="infobody absolute-center"
+                style="position: absolute;
+              width: 491.23px;
+              height: 29.77px;
+              background: #343441;
+              box-shadow: inset 0px 4px 4px #000000;
+              border-radius: 25px;"
+              >
+                <span class="text-h5 text-center absolute-center text-white">Fines</span>
+              </div>
+            </div>
+
+            <div class="botonsito absolute-center" style="position: absolute;width: 228px;height: 37px;background: #343441;top:72%;border-radius: 10px;">
+              <span class="absolute-center">Add Fines</span>
+            </div>
+            <span on:click={openFineModal} class="absolute-center " style="position:absolute; width: 24px;left: 96%;top: 39%;"><img class="absolute-center" src="iconos/Plus.png" style="position:absolute; width: 24px;left: 97%;top: 39%;" alt="" /></span>
+
+            <div class="finecontainer absolute-center scroll hide-scrollbar" style:top="20%">
+              <div class="absolute-center fit scroll hide-scrollbar">
+                <table class="table full-width table-zebra ">
+                  <thead>
+                    <tr>
+                      <th />
+                      <th>Name</th>
+                      <th>Jail Time</th>
+                      <th>Amount</th>
+                      <th>Delete</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {#each Info.fines as fin}
+                      <tr class="hover">
+                        <th>-</th>
+                        <td>{fin.label}</td>
+                        <td>{fin.jailtime}</td>
+                        <td>{fin.amount}</td>
+                        <td><button on:click={() => deteFromArray(fin.id, fin.amount)} class="btn btn-sm">Delete</button></td>
+                      </tr>
+                    {/each}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <th>-</th>
+                      <th>-</th>
+                      <th>Jail Time: {jailTime} Months</th>
+                      <th>Amount: $ {amount}</th>
+                      <th>-</th>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+
+            <div on:click={() => updateContainer(3)} class="buttonBack absolute-bottom no-input fixed-bottom" style="left:1%;bottom:1%;" on:click={previousStep}>
+              <span class="absolute-center text-center" style:font-size="2rem">Back</span>
+            </div>
+
+            <div on:click={() => updateContainer(5)} on:click={nextStep} class="buttonBack absolute-bottom" style="left:74.5%;bottom:1%;">
+              <span class="absolute-center text-center" style:font-size="2rem">Next</span>
             </div>
           </div>
         </StepWizard.Step>
@@ -246,376 +365,117 @@
     </div>
   </div>
 </div>
-</div>
+
 <div id="id" />
 
 <style>
-  :root {
-    --as-toast-border: 1px solid rgba(209, 213, 219, 0.3);
-    --as-toast-backdrop-filter: blur(8px);
-    --as-toast-shadow: 0px 1.4px 2.2px rgba(0, 0, 0, 0.028), 0px 4.7px 7.4px rgba(0, 0, 0, 0.042), 0px 21px 33px rgba(0, 0, 0, 0.07);
-    --as-toast-btn-border: none;
-    --as-toast-info-border-color: rgba(209, 213, 219, 0.3);
-    --as-toast-info-background: rgba(255, 255, 255, 0.7);
-    --as-toast-warn-border-color: hsl(0, 68%, 47%, 30%);
-    --as-toast-warn-background: hsla(0, 69%, 80%, 0.7);
+  .finecontainer {
+    position: absolute;
+    width: 897px;
+    height: 194px;
+    background: #343441;
+    box-shadow: 0px 4px 4px #000000, inset 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+  }
+  .botonsito {
+    box-shadow: 0px 0px 0px #000000;
+  }
+  .botonsito:hover {
+    transition: 0.1s;
+    box-shadow: 0px 4px 4px #000000;
+  }
+  .botonsito:active {
+    transition: 0.1s;
+    box-shadow: inset 0px 4px 4px #000000;
+  }
+  .imagesholder {
+    position: absolute;
+    width: 897px;
+    height: 380px;
+    top: 36%;
+    background: #343441;
+    box-shadow: 0px 4px 4px #000000, inset 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+  }
+  .areatexto {
+    position: absolute;
+    width: 814.86px;
+    max-width: 814.86px;
+    max-height: 121.9px;
+    min-width: 814.86px;
+    min-height: 121.9px;
+    height: 121.9px;
+    top: 14%;
+    background: #ffffff;
+    box-shadow: 0px 4px 4px #000000, inset 0px 4px 4px rgba(0, 0, 0, 0.25);
+    box-shadow: 0px 4px 4px #000000, 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+  }
+  .evidencetab {
+    position: absolute;
+    width: 897px;
+    height: 262px;
+    background: #343441;
+    box-shadow: 0px 4px 4px #000000, inset 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+  }
+  .infocontainer {
+    position: absolute;
+    width: 523.98px;
+    height: 38.27px;
+    background: #191921;
+    box-shadow: 0px 4px 4px #000000;
+    border-radius: 10px;
   }
   .container {
-    position: absolute;
-    width: 557px;
-    height: 485px;
+    width: 100%;
+    height: 100%;
     max-width: 100%;
     max-height: 100%;
     background: #0a0a0b;
     box-shadow: 0px 4px 4px #000000, inset 0px 4px 4px rgba(255, 255, 255, 0.06);
-    border-radius: 50px;
+    border-radius: 10px;
   }
-  .bodyshape {
+  .buttonshape {
+    width: 644px;
+    height: 40px;
+    background: #191921;
+    box-shadow: 0px 4px 4px #000000;
+    border-radius: 10px;
+  }
+  .text-area {
     position: absolute;
-    width: 461px;
-    height: 348px;
-    top: 38.5%;
-    max-width: 100%;
-    max-height: 100%;
-
-    background: #151415;
-    box-shadow: 0px 4px 4px #000000, inset 0px 4px 4px rgba(255, 255, 255, 0.06);
-    border-radius: 50px;
+    width: 80%;
+    height: 37.9px;
+    font-size: 3rem;
+    background: #ffffff;
+    box-shadow: 0px 4px 4px #000000, inset 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+  }
+  .checkbox {
+    background-color: #343441;
+    width: 6%;
+    height: 100%;
+    position: absolute;
+    left: 26%;
+    top: 0px;
+    border-radius: 25px;
+    box-shadow: inset 0px 4px 4px #000000;
   }
   .buttonBack {
     position: absolute;
     width: 228px;
     height: 37px;
-    bottom: -33%;
-    left: 4%;
     max-width: 100%;
     max-height: 100%;
     background: #343441;
-
     border-radius: 25px;
   }
-  .buttonBack1 {
-    position: absolute;
-    width: 228px;
-    height: 37px;
-    left: 25%;
-    bottom: 1%;
-    max-width: 100%;
-    max-height: 100%;
-    background: #343441;
 
-    border-radius: 25px;
-  }
-  .buttonBack1:hover {
-    box-shadow: 0px 4px 4px #000000, inset 0px 0px 0px rgba(0, 0, 0, 0.25);
-  }
-  .buttonBack1:active {
-    box-shadow: 0px 4px 4px #000000, inset 0px 4px 4px rgba(0, 0, 0, 0.25);
-  }
   .buttonBack:hover {
     box-shadow: 0px 4px 4px #000000, inset 0px 0px 0px rgba(0, 0, 0, 0.25);
   }
   .buttonBack:active {
     box-shadow: 0px 4px 4px #000000, inset 0px 4px 4px rgba(0, 0, 0, 0.25);
-  }
-  .buttonNext {
-    position: absolute;
-    width: 228px;
-    height: 37px;
-    bottom: -33%;
-    left: 55.5%;
-    max-width: 100%;
-    max-height: 100%;
-    background: #343441;
-    border-radius: 25px;
-  }
-  .buttonNext:hover {
-    box-shadow: 0px 4px 4px #000000, inset 0px 0px 0px rgba(0, 0, 0, 0.25);
-  }
-  .buttonNext:active {
-    box-shadow: 0px 4px 4px #000000, inset 0px 4px 4px rgba(0, 0, 0, 0.25);
-  }
-
-  .name {
-    width: 352px;
-    height: 27px;
-    position: absolute;
-    color: rgba(255, 255, 255, 1);
-
-    font-family: Poppins;
-    text-align: center;
-    font-size: 16px;
-    letter-spacing: 0;
-  }
-  .containers {
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 1);
-    background-color: rgba(25.000000409781933, 25.000000409781933, 33.00000183284283, 1);
-    width: 352px;
-    height: 27px;
-    position: absolute;
-    border-top-left-radius: 25px;
-    border-top-right-radius: 25px;
-    border-bottom-left-radius: 25px;
-    border-bottom-right-radius: 25px;
-  }
-  .background {
-    background-color: rgba(52.390102967619896, 52.390102967619896, 64.81249898672104, 1);
-    width: 254.8965606689453px;
-    height: 27px;
-    position: absolute;
-
-    border-top-left-radius: 25px;
-    border-top-right-radius: 25px;
-    border-bottom-left-radius: 25px;
-    border-bottom-right-radius: 25px;
-  }
-  .inputs {
-    text-align: center;
-    text-transform: capitalize;
-    box-shadow: 0px 4px 4px #000000, inset 0px 4px 4px rgba(0, 0, 0, 0.25);
-    background-color: rgba(255, 255, 255, 1);
-    width: 255px;
-    height: 26px;
-    position: absolute;
-    color: black;
-    border-top-left-radius: 24px;
-    border-top-right-radius: 24px;
-    border-bottom-left-radius: 24px;
-    border-bottom-right-radius: 24px;
-  }
-  .vehicle {
-    width: 352px;
-    height: 36px;
-    position: absolute;
-  }
-  .body {
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 1);
-    background-color: rgba(25.000000409781933, 25.000000409781933, 33.00000183284283, 1);
-    width: 352px;
-    height: 36px;
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    border-top-left-radius: 25px;
-    border-top-right-radius: 25px;
-    border-bottom-left-radius: 25px;
-    border-bottom-right-radius: 25px;
-  }
-  .checkbox {
-    background-color: rgba(52.390102967619896, 52.390102967619896, 64.81249898672104, 1);
-    width: 38px;
-    height: 36px;
-    position: absolute;
-    left: 100px;
-    top: 0px;
-    border-radius: 25px;
-    box-shadow: inset 0px 4px 4px #000000;
-  }
-  .vehicle_involved {
-    color: rgba(255, 255, 255, 1);
-    width: 97.10344696044922px;
-    height: 9px;
-    position: absolute;
-    left: 0px;
-    top: 12.905597686767578px;
-    font-family: Poppins;
-    text-align: center;
-    font-size: 16px;
-    letter-spacing: 0;
-  }
-
-  .step-primary {
-  }
-  .group_11 {
-    width: 471px;
-    height: 344px;
-    position: absolute;
-  }
-  .bodyapp {
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 1);
-    background-color: rgba(21.000000648200512, 20.000000707805157, 21.000000648200512, 1);
-    width: 471px;
-    height: 344px;
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    border-top-left-radius: 50px;
-    border-top-right-radius: 50px;
-    border-bottom-left-radius: 50px;
-    border-bottom-right-radius: 50px;
-  }
-  .id {
-    width: 471px;
-    height: 323px;
-    position: absolute;
-    left: 0px;
-    top: 9px;
-  }
-  .rectangle_19 {
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 1);
-    background-color: rgba(25.000000409781933, 25.000000409781933, 33.00000183284283, 1);
-    width: 272px;
-    height: 27px;
-    position: absolute;
-    left: 99px;
-    top: 0px;
-    border-top-left-radius: 25px;
-    border-top-right-radius: 25px;
-    border-bottom-left-radius: 25px;
-    border-bottom-right-radius: 25px;
-  }
-  .rectangle_20 {
-    box-shadow: inset 0px 4px 4px #000000;
-    background-color: rgba(52.390102967619896, 52.390102967619896, 64.81249898672104, 1);
-    width: 255px;
-    height: 21px;
-    position: absolute;
-    left: 108px;
-    top: 3px;
-    border-top-left-radius: 25px;
-    border-top-right-radius: 25px;
-    border-bottom-left-radius: 25px;
-    border-bottom-right-radius: 25px;
-  }
-  .information {
-    color: rgba(255, 255, 255, 1);
-    width: 97.10344696044922px;
-    height: 6.75px;
-    position: absolute;
-    left: 186px;
-    top: 1px;
-    font-family: Poppins;
-    text-align: center;
-    font-size: 16px;
-    letter-spacing: 0;
-  }
-  .rectangle_22 {
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 1);
-    background-color: rgba(25.000000409781933, 25.000000409781933, 33.00000183284283, 1);
-    width: 272px;
-    height: 27px;
-    position: absolute;
-    left: 99px;
-    top: 187px;
-    border-top-left-radius: 25px;
-    border-top-right-radius: 25px;
-    border-bottom-left-radius: 25px;
-    border-bottom-right-radius: 25px;
-  }
-  .rectangle_23 {
-    box-shadow: inset 0px 4px 4px #000000;
-    background-color: rgba(52.390102967619896, 52.390102967619896, 64.81249898672104, 1);
-    width: 255px;
-    height: 21px;
-    position: absolute;
-    left: 108px;
-    top: 190px;
-    border-top-left-radius: 25px;
-    border-top-right-radius: 25px;
-    border-bottom-left-radius: 25px;
-    border-bottom-right-radius: 25px;
-  }
-  .rectangle_25 {
-    background-color: rgba(52.390102967619896, 52.390102967619896, 64.81249898672104, 1);
-    width: 471px;
-    height: 7px;
-    position: absolute;
-    left: 0px;
-    top: 163px;
-    border-top-left-radius: 25px;
-    border-top-right-radius: 25px;
-    border-bottom-left-radius: 25px;
-    border-bottom-right-radius: 25px;
-  }
-  .evidencia {
-    color: rgba(255, 255, 255, 1);
-    width: 97.10344696044922px;
-    height: 6.75px;
-    position: absolute;
-    left: 186px;
-    top: 189px;
-    font-family: Poppins;
-    text-align: center;
-    font-size: 16px;
-    letter-spacing: 0;
-  }
-  .rectangle_21 {
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 1);
-    background-color: rgba(255, 255, 255, 1);
-    width: 423px;
-    height: 86px;
-    position: absolute;
-    left: 24px;
-    top: 50px;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-  }
-  .rectangle_24 {
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 1);
-    background-color: rgba(255, 255, 255, 1);
-    width: 423px;
-    height: 86px;
-    position: absolute;
-    left: 24px;
-    top: 237px;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-  }
-  .id_60_164 {
-    width: 508px;
-    height: 302.99981689453125px;
-    position: absolute;
-  }
-  .rectangle_19_60_165 {
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 1);
-    background-color: rgba(25.000000409781933, 25.000000409781933, 33.00000183284283, 1);
-    width: 83%;
-    height: 24.790908813476562px;
-    position: absolute;
-    left: 3%;
-    top: 6%;
-    border-top-left-radius: 25px;
-    border-top-right-radius: 25px;
-    border-bottom-left-radius: 25px;
-    border-bottom-right-radius: 25px;
-  }
-  .rectangle_20_60_166 {
-    box-shadow: inset 0px 4px 4px #000000;
-    background-color: rgba(52.390102967619896, 52.390102967619896, 64.81249898672104, 1);
-    width: 92%;
-    height: 19.281818389892578px;
-    position: absolute;
-
-    border-top-left-radius: 25px;
-    border-top-right-radius: 25px;
-    border-bottom-left-radius: 25px;
-    border-bottom-right-radius: 25px;
-  }
-  .imagenes_60_167 {
-    color: rgba(255, 255, 255, 1);
-    width: 97.10344696044922px;
-    height: 6.197727203369141px;
-    position: absolute;
-    top: 0%;
-    font-family: Poppins;
-    text-align: center;
-    font-size: 16px;
-    letter-spacing: 0;
-  }
-  .my-back {
-    background-color: rgba(255, 255, 55, 0.005) !important;
-  }
-  .modal-overlay {
-    z-index: 1000;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5) !important;
   }
 </style>
