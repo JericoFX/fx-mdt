@@ -18,6 +18,6 @@ files {
     'nui/html/public/iconos/*.png',
     'nui/html/public/iconos/*.jpg'
 }
-server_scripts{ 'server/server.lua',  'config.lua'}
+server_scripts{     '@oxmysql/lib/MySQL.lua','server/server.lua',  'config.lua'}
 
 lua54 'yes'

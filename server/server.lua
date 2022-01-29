@@ -7,6 +7,13 @@ function MDT:Init()
     return self
 end
 
+function escape_str(s)
+    local in_char = {'\\', '"', '/', '\b', '\f', '\n', '\r', '\t'}
+    local out_char = {'\\', '"', '/', 'b', 'f', 'n', 'r', 't'}
+    for i, c in ipairs(in_char) do s = s:gsub(c, '\\' .. out_char[i]) end
+    return s
+end
+
 QBCore.Functions.CreateCallback("fx-mdt:GetPlayerClosestInfo",
                                 function(source, cb, id)
     local Player = QBCore.Functions.GetPlayer(id)
@@ -63,7 +70,7 @@ end)
 
 function GetPolicesOnD()
     local p = promise.new()
-    local players = exports.oxmysql:fetchSync(
+    local players = MySQL.query.await(
                         "SELECT citizenid,JSON_EXTRACT(players.charinfo,'$.firstname') AS Name,JSON_EXTRACT(players.charinfo,'$.lastname') AS LastName, JSON_EXTRACT(players.job,'$.grade.name') AS Rank,JSON_EXTRACT(players.job,'$.name') AS JobName, JSON_EXTRACT(players.job,'$.onduty') AS OnDuty FROM `players` WHERE `job` LIKE '%police%'")
     p:resolve(players)
     return Citizen.Await(p)
@@ -74,25 +81,27 @@ function GetAllReports(tipo, id)
     local reports
     print(tipo, id)
     if id then
-        reports = exports.oxmysql:fetchSync(
+        reports = MySQL.query.await(
                       "SELECT id,citizenid,name,lastname,location,vehicleplate,information,evidencia, imagenes FROM fx_reports WHERE citizenid = ?",
                       {id})
-        return reports
+        if reports then return reports end
+
     else
-        reports = exports.oxmysql:fetchSync(
-                      "SELECT id,citizenid,name,lastname,location,vehicleplate,information,evidencia, imagenes  FROM fx_reports")
-        for k, v in ipairs(reports) do
-            local element = reports[k]
-            Data[#Data + 1] = {
-                name = element.name,
-                lastname = element.lastname,
-                id = element.id,
-                location = element.location,
-                vehicleplate = element.vehicleplate,
-                information = element.information,
-                evidencia = json.decode(element.evidencia),
-                imagenes = json.decode(element.imagenes)
-            }
+        reports = MySQL.query.await("SELECT * FROM fx_reports")
+        if reports then
+            for k, v in ipairs(reports) do
+                local element = reports[k]
+                Data[#Data + 1] = {
+                    name = element.name,
+                    lastname = element.lastname,
+                    id = element.id,
+                    location = element.location,
+                    vehicleplate = element.vehicleplate,
+                    information = element.information,
+                    evidencia = json.decode(element.evidencia),
+                    imagenes = json.decode(element.imagenes)
+                }
+            end
         end
 
     end
@@ -123,7 +132,7 @@ RegisterCommand("getpo",
 
 function GetVehicleModsInfo(id)
     local p = promise.new()
-    local players = exports.oxmysql:fetchSync(
+    local players = MySQL.query.await(
                         "SELECT plate,vehicle,garage,state, JSON_EXTRACT(mods, '$.engineHealth') AS engineHealth,JSON_EXTRACT(mods, '$.bodyHealth') AS bodyHealth,JSON_EXTRACT(mods, '$.fuelLevel') AS fuelLevel FROM player_vehicles WHERE citizenid = ?",
                         {id})
     p:resolve(players)
@@ -133,7 +142,7 @@ end
 RegisterCommand("getsql", function(source, args)
     local Data = GetAllReports("citizenid", "FQI55932")
     QBCore.Debug(Data)
-    -- local players = exports.oxmysql:fetchSync(
+    -- local players = MySQL.Sync.fetchSingle(
     --     "UPDATE player_vehicles SET mods = JSON_REPLACE(mods,'$.engineHealth',?,'$.bodyHealth',?,'$.fuelLevel',?) WHERE plate = ?",
     --     {100.1, 100.1, 100.1, "25HMB316"}) -- Replace Data without taking the time to decode and encode again
 
@@ -142,31 +151,16 @@ end)
 QBCore.Functions.CreateCallback("fx-mdt:GetPlayerInfo", function(source, cb, id)
     local Data = {}
 
-    exports.oxmysql:fetch(
+    MySQL.query(
         "SELECT citizenid,JSON_EXTRACT(players.charinfo,'$.firstname') AS firstname, JSON_EXTRACT(players.charinfo,'$.lastname') AS lastname,JSON_EXTRACT(players.job,'$.grade.name') AS rank ,JSON_EXTRACT(players.job,'$.name') AS jobname, JSON_EXTRACT(players.charinfo,'$.phone') AS phone,  JSON_EXTRACT(players.job,'$.payment') AS payment FROM players  WHERE players.charinfo LIKE ? ",
         {string.lower('%' .. id .. '%')}, function(result)
-            for k, v in pairs(result) do
-                local PlayerOnline = QBCore.Functions.GetPlayer(result[k]
-                                                                    .citizenid)
-                local result1 = GetVehicleModsInfo(result[k].citizenid)
-                local Cases = GetAllReports(result[k].citizenid)
-                local Houses = exports.oxmysql.fetchSync(
-                                   "SELECT house FROM player_houses WHERE citizenid = ?",
-                                   {result[k].citizenid})
-                if PlayerOnline then
-                    Data[#Data + 1] = {
-                        Name = PlayerOnline.PlayerData.charinfo.firstname,
-                        LastName = PlayerOnline.PlayerData.charinfo.lastname,
-                        CitizenID = PlayerOnline.PlayerData.citizenid,
-                        Rank = PlayerOnline.PlayerData.job.grade.name,
-                        JobName = PlayerOnline.PlayerData.job.name,
-                        Payment = PlayerOnline.PlayerData.job.payment,
-                        Phone = PlayerOnline.PlayerData.charinfo.phone,
-                        Vehicles = result1,
-                        Houses = Houses
-
-                    }
-                else
+            QBCore.Debug(result)
+            if result then
+                for k, v in ipairs(result) do
+                    print(json.encode(k))
+                    local result1 = GetVehicleModsInfo(result[k].citizenid)
+                     local Cases = GetAllReports(result[k].citizenid)
+                      local Houses = MySQL.query.await("SELECT house FROM player_houses WHERE citizenid = ?",{result[k].citizenid})
                     Data[#Data + 1] = {
                         Name = result[k].firstname,
                         LastName = result[k].lastname,
@@ -179,9 +173,12 @@ QBCore.Functions.CreateCallback("fx-mdt:GetPlayerInfo", function(source, cb, id)
                         Houses = Houses,
                         Casos = Cases
                     }
+
                 end
+
+                cb(Data)
             end
-            cb(Data)
+
         end)
 
 end)
@@ -200,19 +197,20 @@ RegisterNetEvent("fx-mdt:server:InsertReport", function(data)
     QBCore.Debug(data)
     local src = source
 
-    exports.oxmysql:execute(
+    MySQL.Sync.insert(
         "INSERT INTO fx_reports (id,citizenid,name,lastname,location,vehicleplate,information,evidencia,imagenes,fine,policesinvolved,jailtime,amount) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
         {
             data.ID, data.citizenID, data.name, data.lastName, data.location,
             data.vehiclePlate, data.information, json.encode(data.evidencia),
-            json.encode(data.imagen),json.encode(data.fines),json.encode(data.polices),data.jailTime,data.amount
+            json.encode(data.imagen), json.encode(data.fines),
+            json.encode(data.polices), data.jailTime, data.amount
         })
 
 end)
 RegisterCommand("sqlputo", function(source, args)
 
-    exports.oxmysql:execute('INSERT INTO fx_reports VALUES (?,?,?,?,?,?,?,?,?)',
-                            {1, 1, 1, 2, 3, 4, 5, 6, 7}, function(putos) end)
+    MySQL.Sync.insert('INSERT INTO fx_reports VALUES (?,?,?,?,?,?,?,?,?)',
+                      {1, 1, 1, 2, 3, 4, 5, 6, 7}, function(putos) end)
 
 end, false)
 
@@ -260,7 +258,7 @@ QBCore.Functions.CreateCallback("fx-mdt:server:GetVehicleData",
     local src = source
     local Placa = plate
     local Data = {}
-    local result = exports.oxmysql:fetchSync(
+    local result = MySQL.Sync.fetchSingle(
                        "SELECT citizenid AS owner, JSON_EXTRACT(mods,'$.color1') AS color,vehicle FROM player_vehicles WHERE plate = ?",
                        {Placa})[1]
     Data = {
