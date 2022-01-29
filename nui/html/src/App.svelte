@@ -123,6 +123,8 @@
 
 <style global>
   :root {
+    
+
     background-color: transparent;
   }
   :global(*) {

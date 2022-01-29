@@ -125,3 +125,7 @@ RegisterNUICallback("getVehicleData", function(data, cb)
     QBCore.Functions.TriggerCallback("fx-mdt:server:GetVehicleData",
         function(d) cb(d) end,Plate)
 end)
+RegisterNUICallback("getPolices", function(data,cb)
+    QBCore.Functions.TriggerCallback("fx-mdt:server:GetPolices",
+        function(d) cb(d) end)
+end)

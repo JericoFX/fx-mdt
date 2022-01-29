@@ -115,6 +115,7 @@
 
 						<div class="background fit fixed-center " transition:fade={{duration: 100}}>
 							<div class="bodycenter fixed-bottom">
+								
 								<span
 								><input bind:value={SearchName} type="text" class="fixed-top searchbar text-center text-black" name="fixed-top" style="left:27%;top:5%;" id="" />
 								<div class="btn-group" style="left: 63%;top: 4%;position: absolute;">
@@ -141,11 +142,11 @@
 								<div class="Container">
 									<div class="Name datos" style="top:18%;left:2%">
 										<div class="datosLegacy absolute-right" > 
-											<p class="text-center absolute-center text-h5" >
+											<p  class="text-center absolute-center text-h5" >
 												{Name}
 											</p>
 										</div>
-										<p class="absolute-left text-h6" style="top:28%;left:3%;">Name</p>
+										<p  class="absolute-left text-h6" style="top:28%;left:3%;">Name</p>
 									</div>
 
 									<div class="Name datos " style="top:32%;left:2%">

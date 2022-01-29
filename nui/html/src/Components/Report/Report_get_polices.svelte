@@ -1,22 +1,25 @@
 <script lang="ts">
   import {createEventDispatcher, onMount} from 'svelte';
-  import Fines from '../../utils/fines';
+import { fetchNui } from '../../utils/fetchNui';
   const dispatch = createEventDispatcher();
+
   export let open = false;
   export let table = [];
-  let FinesAdded = table;
-let jerico = false
+  let Polices = table;
+    let jerico = false
   const sendData = (e) => {
-
-      FinesAdded.push(e);
-
-
-    FinesAdded = FinesAdded;
+    Polices.push(e);
+    Polices = Polices;
   };
   const closeModal = () => {
     open = false;
-    dispatch('sendFines', {FinesAdded});
+    dispatch('sendPolices', {Polices});
   };
+  fetchNui("getPolices").then((cb) =>{
+    if(cb){
+      table = cb
+    }
+  })
 </script>
 
 {#if open}
@@ -27,22 +30,22 @@ let jerico = false
           <thead>
             <tr>
               <th>-</th>
-              <th>ID</th>
-              <th>label</th>
-              <th>Jail Time</th>
-              <th>Amount</th>
+              <th>Name</th>
+              <th>Last Name</th>
+              <th>CID</th>
+              <th>Rank</th>
             </tr>
           </thead>
           <tbody>
-            {#each Fines as fin}
+            {#each table as fin}
               <tr class="hover">
                 <th>
                   <input on:click={() => sendData(fin)}  type="checkbox" name="" id="" />
                 </th>
-                <th>{fin.id}</th>
-                <td>{fin.label}</td>
-                <td>{fin.jailtime}</td>
-                <td>{fin.amount}</td>
+                <th>{fin.Name.replaceAll('"', '')}</th>
+                <td>{fin.LastName.replaceAll('"', '')}</td>
+                <td>{fin.citizenid.replaceAll('"', '')}</td>
+                <td>{fin.Rank.replaceAll('"', '')}</td>
               </tr>
             {/each}
           </tbody>

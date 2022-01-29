@@ -34,7 +34,7 @@
         <div class="buttonbody absolute-center" style:top="15%">
           <input type="text" bind:value={Plate} class="buttontext absolute-right text-center text-subtitle1 text-uppercase text-black text-bold" />
           <div on:click={getVehicleByPlate} class="icon">
-            <img src="iconos/search.png" class="absolute-right icon" style="left: 101%;width: 33px;top: 5%;border-radius: 10px;" />
+            <img alt="asd" src="iconos/search.png" class="absolute-right icon" style="left: 101%;width: 33px;top: 5%;border-radius: 10px;" />
           </div>
           <div class="text">
             <span class="absolute-left customize" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Plate</span>
