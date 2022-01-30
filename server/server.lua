@@ -7,7 +7,6 @@ function MDT:Init()
     return self
 end
 
-
 QBCore.Functions.CreateCallback("fx-mdt:GetPlayerClosestInfo",
                                 function(source, cb, id)
     local Player = QBCore.Functions.GetPlayer(id)
@@ -133,7 +132,6 @@ function GetVehicleModsInfo(id)
     return Citizen.Await(p)
 end
 
-
 function GetVehicleBolos()
     local p = promise.new()
     local vehicles = MySQL.query.await("SELECT * FROM fx_vehiclereports")
@@ -162,7 +160,9 @@ QBCore.Functions.CreateCallback("fx-mdt:GetPlayerInfo", function(source, cb, id)
                     print(json.encode(k))
                     local result1 = GetVehicleModsInfo(result[k].citizenid)
                     local Cases = GetAllReports(result[k].citizenid)
-                    local Houses = MySQL.query.await("SELECT house FROM player_houses WHERE citizenid = ?",{result[k].citizenid})
+                    local Houses = MySQL.query.await(
+                                       "SELECT house FROM player_houses WHERE citizenid = ?",
+                                       {result[k].citizenid})
                     Data[#Data + 1] = {
                         Name = result[k].firstname,
                         LastName = escape_str(result[k].lastname),
@@ -196,48 +196,50 @@ QBCore.Functions.CreateCallback("fx-mdt:server:GetWebhook", function(source, cb)
 end)
 
 RegisterNetEvent("fx-mdt:server:InsertReport", function(data)
-    QBCore.Debug(data)
     local src = source
-
-    MySQL.Sync.insert(
-        "INSERT INTO fx_reports (id,citizenid,name,lastname,location,vehicleplate,information,evidencia,imagenes,fine,policesinvolved,jailtime,amount) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
-        {
-            data.ID, data.citizenID, data.name, data.lastName, data.location,
-            data.vehiclePlate, data.information, json.encode(data.evidencia),
-            json.encode(data.imagen), json.encode(data.fines),
-            json.encode(data.polices), data.jailTime, data.amount
-        })
-
+    if IsPolice(src) then
+        MySQL.Sync.insert(
+            "INSERT INTO fx_reports (id,citizenid,name,lastname,location,vehicleplate,information,evidencia,imagenes,fine,policesinvolved,jailtime,amount) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            {
+                data.ID, data.citizenID, data.name, data.lastName,
+                data.location, data.vehiclePlate, data.information,
+                json.encode(data.evidencia), json.encode(data.imagen),
+                json.encode(data.fines), json.encode(data.polices),
+                data.jailTime, data.amount
+            })
+    end
 end)
-
 
 QBCore.Functions.CreateCallback("fx-mdt:server:GetEvidence",
                                 function(source, cb)
     local src = source
-    local Blood = {}
-    local Bullets = {}
-    local Player = QBCore.Functions.GetPlayer(src)
-    local Item = Player.Functions.GetItemsByName("filled_evidence_bag")
-    if Item then
-        for k, v in ipairs(Item) do
-            local element = Item[k]
-            if element.info.type == "blood" then
-                local spl = string.fromhex(element.info.dnalabel)
-                Blood[#Blood + 1] = {
-                    type = element.info.type,
-                    street = element.info.street,
-                    bloodtype = element.info.bloodtype,
-                    dnalabel = element.info.dnalabel
-                }
-            else
-                if element.info.type == "casing" then
+    if IsPolice(src) then
+
+        local Blood = {}
+        local Bullets = {}
+        local Player = QBCore.Functions.GetPlayer(src)
+        local Item = Player.Functions.GetItemsByName("filled_evidence_bag")
+        if Item then
+            for k, v in ipairs(Item) do
+                local element = Item[k]
+                if element.info.type == "blood" then
+                    local spl = string.fromhex(element.info.dnalabel)
                     Blood[#Blood + 1] = {
                         type = element.info.type,
                         street = element.info.street,
-                        ammotype = element.info.ammotype,
-                        ammolabel = element.info.ammolabel
+                        bloodtype = element.info.bloodtype,
+                        dnalabel = element.info.dnalabel
                     }
+                else
+                    if element.info.type == "casing" then
+                        Blood[#Blood + 1] = {
+                            type = element.info.type,
+                            street = element.info.street,
+                            ammotype = element.info.ammotype,
+                            ammolabel = element.info.ammolabel
+                        }
 
+                    end
                 end
             end
         end
@@ -250,18 +252,17 @@ function string.fromhex(str)
         (str:gsub('..', function(cc) return string.char(tonumber(cc, 16)) end))
 end
 
-function deletecuotes (string)
-    return (string:gsub('"(%d+)"', "%1"))
-end
+function deletecuotes(string) return (string:gsub('"(%d+)"', "%1")) end
 
 QBCore.Functions.CreateCallback("fx-mdt:server:GetVehicleData",
                                 function(source, cb, plate)
     local src = source
     local Placa = plate
     local Data = {}
-    MySQL.query("SELECT citizenid AS owner, JSON_EXTRACT(mods,'$.color1') AS color,vehicle FROM player_vehicles WHERE plate = ?",
+    MySQL.query(
+        "SELECT citizenid AS owner, JSON_EXTRACT(mods,'$.color1') AS color,vehicle FROM player_vehicles WHERE plate = ?",
         {Placa}, function(result)
-            if not result[1]  then
+            if not result[1] then
                 TriggerClientEvent("QBCore:Notify", source, "No Vehicle Found")
                 cb({})
                 return
@@ -277,7 +278,6 @@ QBCore.Functions.CreateCallback("fx-mdt:server:GetVehicleData",
             cb(Data)
         end)
 
-
 end)
 
 QBCore.Functions.CreateCallback("fx-mdt:server:GetPolices", function(source, cb)
@@ -286,17 +286,89 @@ QBCore.Functions.CreateCallback("fx-mdt:server:GetPolices", function(source, cb)
     cb(Polices)
 end)
 
-QBCore.Functions.CreateCallback("fx-mdt:server:SaveVehicleBolo",function(source,cb,data)
-local src = source
+QBCore.Functions.CreateCallback("fx-mdt:server:SaveVehicleBolo",
+                                function(source, cb, data)
+    local src = source
     QBCore.Debug(data)
-    MySQL.Sync.insert("INSERT INTO fx_vehiclereports (id,plate,citizenid,color,vehicle,brand,category,information) VALUES (?,?,?,?,?,?,?,?)",
-    {
-        data.ID,data.Plate,data.Owner,data.Color,data.VehicleName,data.Brand,data.Category,data.Information
-    })
+    MySQL.Sync.insert(
+        "INSERT INTO fx_vehiclereports (id,plate,citizenid,color,vehicle,brand,category,information) VALUES (?,?,?,?,?,?,?,?)",
+        {
+            data.ID, data.Plate, data.Owner, data.Color, data.VehicleName,
+            data.Brand, data.Category, data.Information
+        })
 end)
-TriggerLatent
-QBCore.Functions.CreateCallback("fx-mdt:server:GetVehicleBolos",function(source,cb)
-local VehiclesBolos = GetVehicleBolos()
-QBCore.Debug(VehiclesBolos)
-cb(VehiclesBolos)
+QBCore.Functions.CreateCallback("fx-mdt:server:GetVehicleBolos",
+                                function(source, cb)
+    local VehiclesBolos = GetVehicleBolos()
+    QBCore.Debug(VehiclesBolos)
+    cb(VehiclesBolos)
 end)
+
+RegisterNetEvent("fx-mdt:server:BloodMenu", function()
+    local src = source
+    if src > 0 then
+        if IsPolice(src) then
+            local Player = QBCore.Functions.GetPlayer(source)
+            local Item = Player.Functions.GetItemsByName("filled_evidence_bag")
+            if Player then
+                if Item then
+                    for k, v in ipairs(Item) do
+                        local element = Item[k]
+                        if element.info.type == "blood" then
+                            local spl = string.fromhex(element.info.dnalabel)
+                            local result = MySQL.query.await(
+                                               "SELECT citizenid, JSON_EXTRACT(charinfo,'$.firstname') AS firstname, JSON_EXTRACT(charinfo,'$.lastname') AS lastname FROM players WHERE citizenid = ?",
+                                               {spl})
+                            local MailData = {
+                                sender = "Hospital",
+                                subject = "Blood Test",
+                                message = "The result of the blood exam is " ..
+                                    spl .. " The name is " ..
+                                    deletecuotes(result[1].firstname) .. " " ..
+                                    deletecuotes(result[1].lastname)
+                            }
+                            TriggerEvent("qb-phone:server:sendNewMailToOffline",
+                                         Player.PlayerData.citizenid, MailData)
+                        end
+                    end
+                end
+            end
+        end
+    end
+end)
+
+-- RegisterNetEvent("fx-mdt:server:GetBlood", function()
+--     local dato = {}
+--     if IsPolice(source) then
+--         local Player = QBCore.Functions.GetPlayer(source)
+--         local Item = Player.Functions.GetItemsByName("filled_evidence_bag")
+--         if Player then
+--             if Item then
+--                 local ar = {1, 3, 4, 5, 6, 7, 8, 9, 0}
+--                 for k, v in ipairs(ar) do
+--                     --  local element = Item[k]
+--                     -- if element.info.type == "blood" then
+--                     -- local spl = string.fromhex(element.info.dnalabel)
+--                     dato = {
+--                         header = "Test",
+--                         submitText = "Bill",
+--                         inputs = {
+--                             {
+--                                 text = "no",
+--                                 name = "No",
+--                                 type = "select",
+--                                 options = {{value = k, text = k .. " label"}}
+
+--                             }
+--                         }
+--                     }
+
+--                     TriggerClientEvent('qb-input:client:showInput', -1, dato)
+
+--                     -- end
+--                 end
+--             end
+--         end
+--     end
+-- end)
+

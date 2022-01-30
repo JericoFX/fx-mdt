@@ -5,7 +5,6 @@
   import {Name, OnDuty, PolicesOnDuty, Rank, PolicesOnCount, IS_VISIBLE} from './store/store';
   import {useNuiEvent} from './utils/useNuiEvent';
   $: displayed = 'none';
-  $IS_VISIBLE = true
   $: if ($IS_VISIBLE) {
     displayed = 'block';
   } else {

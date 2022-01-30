@@ -6,8 +6,11 @@ version '0.0.1b'
 ui_page 'nui/html/public/index.html'
 
 client_scripts {
+    "@PolyZone/client.lua",
+    '@PolyZone/BoxZone.lua',
     'config.lua',
-    'client/client.lua'
+    'client/client.lua',
+    "client/blood.lua"
 }
 files {
     'nui/html/public/index.html',
