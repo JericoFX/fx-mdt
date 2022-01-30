@@ -3,26 +3,56 @@
   import {push} from 'svelte-spa-router';
   import {fade} from 'svelte/transition';
   import {fetchNui} from '../../utils/fetchNui';
+  import Vehicle_Information from "./Vehicle_Information.svelte"
   import Colores from '../../utils/vehicle-colors';
-  const dispatch = createEventDispatcher();
-  $: Plate = '';
-  let Owner = '',
-    Color = '',
-    Brand = '',
-    Category = '',
-    VehicleName = '';
+  import {v4 as uuid4} from 'uuid';
+  let open = false
+  $: Vehiculo = {
+    ID: uuid4(),
+    Owner: '',
+    Plate: "",
+    Color: '',
+    Brand: '',
+    Category: '',
+    VehicleName: '',
+    Information: ""
+  };
+  $: Placa = Vehiculo.Plate
   const getVehicleByPlate = () => {
-    fetchNui('getVehicleData', {Plate}).then((cb) => {
-      Owner = cb.Owner;
-      (Color = getColorHex(cb.Color)), (Brand = cb.Brand), (VehicleName = cb.VehicleName), (Category = cb.Category);
+    console.log(Placa);
+    
+    fetchNui('getVehicleData', {Placa}).then((cb) => {
+      if (cb) {
+        console.log(JSON.stringify(cb));
+        
+        Vehiculo.Owner = cb.Owner;
+        (Vehiculo.Color = getColorHex(cb.Color)), (Vehiculo.Brand = cb.Brand), (Vehiculo.VehicleName = cb.VehicleName), (Vehiculo.Category = cb.Category);
+      }
     });
   };
   const getColorHex = (color: string): string => {
     return Colores.filter((col) => col.ID === color.toString())[0].Hex;
   };
-  const addBolo = () =>{
-    
-  }
+  const addBolo = () => {
+  const DIV = document.getElementById("id")
+    open = true
+    let m = new Vehicle_Information({
+      target: DIV,
+      props:{
+        open: open,
+        text:""
+      }
+    })
+  m.$on("closedModal",(data) =>{
+    Vehiculo.Information = data.detail.text 
+    fetchNui("saveVehicleBolo",{Vehiculo}).then((cb) =>{
+      push("/")
+    })
+  })
+    //Vehiculo
+  };
+
+
 </script>
 
 <div class="modal-overlay" transition:fade={{duration: 100}}>
@@ -32,7 +62,7 @@
       <p class="absolute-center" style="top:8%;font-size:4rem">VEHICLES</p>
       <div class="Consiencia" style=" top: 3%;    width: 100%;    position: absolute;    height: 100%;">
         <div class="buttonbody absolute-center" style:top="15%">
-          <input type="text" bind:value={Plate} class="buttontext absolute-right text-center text-subtitle1 text-uppercase text-black text-bold" />
+          <input type="text" bind:value={Vehiculo.Plate} class="buttontext absolute-right text-center text-subtitle1 text-uppercase text-black text-bold" />
           <div on:click={getVehicleByPlate} class="icon">
             <img alt="asd" src="iconos/search.png" class="absolute-right icon" style="left: 101%;width: 33px;top: 5%;border-radius: 10px;" />
           </div>
@@ -42,50 +72,50 @@
         </div>
         <div class="separator absolute-center" style:top="22.5%" />
         <div class="buttonbody absolute-center" style:top="30%">
-          <input type="text" bind:value={Owner} class="buttontext absolute-right text-center text-black text-bold text-h6 text-capitalize" />
+          <input type="text" bind:value={Vehiculo.Owner} class="buttontext absolute-right text-center text-black text-bold text-h6 text-capitalize" />
           <div class="text">
             <span class="absolute-left customize" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Owner</span>
           </div>
         </div>
         <div class="separator absolute-center" style:top="37.5%" />
         <div class="buttonbody absolute-center" style:top="45%">
-          <div class="buttontext absolute-right text-center" style={'background:' + Color + ';'} />
+          <div class="buttontext absolute-right text-center" style={'background:' + Vehiculo.Color + ';'} />
           <div class="text">
-            <span class="absolute-left customize" s>Color</span>
+            <span class="absolute-left customize">Color</span>
           </div>
         </div>
         <div class="separator absolute-center" style:top="52.5%" />
         <div class="buttonbody absolute-center" style:top="60%">
-          <input disabled type="text" bind:value={VehicleName} class="buttontext absolute-right text-center text-capitalize text-black" />
+          <input disabled type="text" bind:value={Vehiculo.VehicleName} class="buttontext absolute-right text-center text-capitalize text-black" />
           <div class="text">
             <span class="absolute-left" style="left:5%;color:white;top:25%;font-size: 18px;">Vehicle Name</span>
           </div>
         </div>
         <div class="separator absolute-center" style:top="67.5%" />
         <div class="buttonbody absolute-center" style:top="75%">
-          <input disabled type="text" bind:value={Brand} class="buttontext absolute-right text-center text-capitalize text-black" />
+          <input disabled type="text" bind:value={Vehiculo.Brand} class="buttontext absolute-right text-center text-capitalize text-black" />
           <div class="text">
             <span class="absolute-left customize" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Brand</span>
           </div>
         </div>
         <div class="separator absolute-center" style:top="82.5%" />
         <div class="buttonbody absolute-center" style:top="90%">
-          <input disabled type="text" bind:value={Category} class="buttontext absolute-right text-center text-capitalize text-black" />
+          <input disabled type="text" bind:value={Vehiculo.Category} class="buttontext absolute-right text-center text-capitalize text-black" />
           <div class="text">
             <span class="absolute-left customize" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Category</span>
           </div>
         </div>
       </div>
     </div>
-    <div on:click={addBolo} class="buttonactions absolute-bottom" style:color="white" style:bottom="3%" style:left="2.5%">
-      <span class="absolute-center"> ADD BOLO </span>
+    <div on:click={addBolo} class="buttonactions absolute-bottom" style="top: 91.5%;left: 2.5%;bottom: 0.5%;">
+      <span  class="absolute-center"> CREATE BOLO</span>
     </div>
     <div on:click={() => push('/')} class="buttonactions absolute-bottom" style:color="white" style:bottom="3%" style:left="71.5%">
-      <span class="absolute-center"> CERRAR </span>
+      <span class="absolute-center"> Cerrar </span>
     </div>
   </div>
 </div>
-
+<div id="id"></div>
 <style>
   .customize {
     left: 10%;
@@ -115,9 +145,9 @@
   }
   .body {
     position: absolute;
-    width: 95%;
+    height: 86%;
     top: 45%;
-    height: 85%;
+    width: 90%;
     background: #151415;
     border-radius: 10px;
   }

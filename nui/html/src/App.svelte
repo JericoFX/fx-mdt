@@ -4,7 +4,6 @@
   import {fetchNui} from './utils/fetchNui';
   import {Name, OnDuty, PolicesOnDuty, Rank, PolicesOnCount, IS_VISIBLE} from './store/store';
   import {useNuiEvent} from './utils/useNuiEvent';
-  $: isVisible = true;
   $: displayed = 'none';
   $IS_VISIBLE = true
   $: if ($IS_VISIBLE) {
@@ -52,13 +51,7 @@
       <img src="iconos/back.jpg" style:border-radius="25px" class="fit" alt="" />
       <div
         class="fixed-center q-mb-lg"
-        style="display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      align-content: space-between;
-       justify-content: center;
-      align-items: stretch;width:100%;"
-      >
+        style="display: flex; flex-direction: row;flex-wrap: wrap;align-content: space-between;justify-content: center;align-items: stretch;width:100%;">
         {#each APP as ap}
           <p on:click={() => handleClick(ap.name)} class="text-center shadow mx-8  rounded-box shadow-lg bg-neutral ">
             <img src={ap.icon} class="bg-sky-600 hover:bg-sky-700" alt="altv" style:width="256px" />

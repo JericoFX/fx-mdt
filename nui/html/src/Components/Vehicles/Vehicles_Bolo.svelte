@@ -1,6 +1,16 @@
 <script lang="ts">
   import {createEventDispatcher} from 'svelte';
+import { push } from 'svelte-spa-router';
+import { fetchNui } from '../../utils/fetchNui';
   const dispatch = createEventDispatcher();
+	let Bolos = []
+fetchNui("getVehicleBolos").then((cb) =>{
+	if(cb){
+		console.log(JSON.stringify(cb));
+		
+		Bolos = cb
+	}
+})
 </script>
 
 <div class="container absolute-center">
@@ -21,16 +31,19 @@
 						</tr>
 					</thead> 
 					<tbody>
+						{#each Bolos as veh }
 						<tr>
-							<th>-</th> 
-							<td>25HMB316</td> 
-							<td>Manana</td> 
-							<td>Karin</td>
-							<td>FQI55932</td>
-							<td><span class=" badge full-width" style="background:red;"></span></td>
-							<th><button class="btn btn-sm text-center">Open Report</button></th>
-							<th>-</th>
+							<td>-</td>
+							<td>{veh.plate}</td>
+							<td>{veh.vehicle}</td>
+							<td>{veh.brand}</td>
+							<td>{veh.citizenid}</td>
+							<td><span class=" badge full-width" style={`background:${veh.color}`}></span>	</td>
+							<!-- <td>></span></td> -->
+							<th><button   class="btn btn-sm text-center">Open Report</button></th>
 						</tr>
+						{/each}
+					
 					</tbody>
 				</table>
 			</div>
@@ -38,8 +51,8 @@
 
 		</div>
 	</div>
-	<button class="btn btn-wide btn-lg absolute-bottom" style="left:5%;bottom:0.5%;"> Add Report </button>
-	<button class="btn btn-wide btn-lg absolute-bottom" style="left:88.5%;bottom:0.5%;"> Close </button>
+	<button  class="btn btn-wide btn-lg absolute-bottom" style="left:5%;bottom:0.5%;"> Add Report </button>
+	<button on:click="{() => push("/")}" class="btn btn-wide btn-lg absolute-bottom" style="left:88.5%;bottom:0.5%;"> Close </button>
 </div>
 
 <style>

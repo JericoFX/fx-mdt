@@ -10,12 +10,6 @@
       Data = cb;
     }
   });
-  let puto = [
-    {type: 'casing', street: 'Sinner Street | Atlee Street', ammotype: 453432689, ammolabel: '9x19mm parabellum bullet'},
-    {type: 'casing', street: 'San Andreas Avenue | ', ammotype: 453432689, ammolabel: '9x19mm parabellum bullet'},
-    {type: 'blood', street: 'Atlee Street | ', dnalabel: '4c54583635303934', bloodtype: 'B-'},
-  ];
-
   const openReportModal = (data) => {
     OpenModal = true;
     const Div = document.getElementById('id');

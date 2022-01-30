@@ -7,12 +7,6 @@ function MDT:Init()
     return self
 end
 
-function escape_str(s)
-    local in_char = {'\\', '"', '/', '\b', '\f', '\n', '\r', '\t'}
-    local out_char = {'\\', '"', '/', 'b', 'f', 'n', 'r', 't'}
-    for i, c in ipairs(in_char) do s = s:gsub(c, '\\' .. out_char[i]) end
-    return s
-end
 
 QBCore.Functions.CreateCallback("fx-mdt:GetPlayerClosestInfo",
                                 function(source, cb, id)
@@ -81,7 +75,7 @@ function GetAllReports(tipo, id)
     local reports
     print(tipo, id)
     if id then
-        reports = MySQL.query.await(
+        reports = MySQL.scalar.await(
                       "SELECT id,citizenid,name,lastname,location,vehicleplate,information,evidencia, imagenes FROM fx_reports WHERE citizenid = ?",
                       {id})
         if reports then return reports end
@@ -139,8 +133,16 @@ function GetVehicleModsInfo(id)
     return Citizen.Await(p)
 end
 
+
+function GetVehicleBolos()
+    local p = promise.new()
+    local vehicles = MySQL.query.await("SELECT * FROM fx_vehiclereports")
+    p:resolve(vehicles)
+    return Citizen.Await(p)
+end
+
 RegisterCommand("getsql", function(source, args)
-    local Data = GetAllReports("citizenid", "FQI55932")
+    local Data = GetVehicleBolos()
     QBCore.Debug(Data)
     -- local players = MySQL.Sync.fetchSingle(
     --     "UPDATE player_vehicles SET mods = JSON_REPLACE(mods,'$.engineHealth',?,'$.bodyHealth',?,'$.fuelLevel',?) WHERE plate = ?",
@@ -159,16 +161,16 @@ QBCore.Functions.CreateCallback("fx-mdt:GetPlayerInfo", function(source, cb, id)
                 for k, v in ipairs(result) do
                     print(json.encode(k))
                     local result1 = GetVehicleModsInfo(result[k].citizenid)
-                     local Cases = GetAllReports(result[k].citizenid)
-                      local Houses = MySQL.query.await("SELECT house FROM player_houses WHERE citizenid = ?",{result[k].citizenid})
+                    local Cases = GetAllReports(result[k].citizenid)
+                    local Houses = MySQL.query.await("SELECT house FROM player_houses WHERE citizenid = ?",{result[k].citizenid})
                     Data[#Data + 1] = {
                         Name = result[k].firstname,
-                        LastName = result[k].lastname,
+                        LastName = escape_str(result[k].lastname),
                         CitizenID = result[k].citizenid,
-                        Rank = result[k].rank,
-                        JobName = result[k].jobname,
-                        Payment = result[k].payment,
-                        Phone = result[k].phone,
+                        Rank = escape_str(result[k].rank),
+                        JobName = escape_str(result[k].jobname),
+                        Payment = escape_str(result[k].payment),
+                        Phone = escape_str(result[k].phone),
                         Vehicles = result1,
                         Houses = Houses,
                         Casos = Cases
@@ -207,12 +209,7 @@ RegisterNetEvent("fx-mdt:server:InsertReport", function(data)
         })
 
 end)
-RegisterCommand("sqlputo", function(source, args)
 
-    MySQL.Sync.insert('INSERT INTO fx_reports VALUES (?,?,?,?,?,?,?,?,?)',
-                      {1, 1, 1, 2, 3, 4, 5, 6, 7}, function(putos) end)
-
-end, false)
 
 QBCore.Functions.CreateCallback("fx-mdt:server:GetEvidence",
                                 function(source, cb)
@@ -253,22 +250,34 @@ function string.fromhex(str)
         (str:gsub('..', function(cc) return string.char(tonumber(cc, 16)) end))
 end
 
+function deletecuotes (string)
+    return (string:gsub('"(%d+)"', "%1"))
+end
+
 QBCore.Functions.CreateCallback("fx-mdt:server:GetVehicleData",
                                 function(source, cb, plate)
     local src = source
     local Placa = plate
     local Data = {}
-    local result = MySQL.Sync.fetchSingle(
-                       "SELECT citizenid AS owner, JSON_EXTRACT(mods,'$.color1') AS color,vehicle FROM player_vehicles WHERE plate = ?",
-                       {Placa})[1]
-    Data = {
-        Owner = result.owner,
-        Color = result.color,
-        VehicleName = result.vehicle,
-        Category = QBCore.Shared.Vehicles[result.vehicle].category,
-        Brand = QBCore.Shared.Vehicles[result.vehicle].brand
-    }
-    cb(Data)
+    MySQL.query("SELECT citizenid AS owner, JSON_EXTRACT(mods,'$.color1') AS color,vehicle FROM player_vehicles WHERE plate = ?",
+        {Placa}, function(result)
+            if not result[1]  then
+                TriggerClientEvent("QBCore:Notify", source, "No Vehicle Found")
+                cb({})
+                return
+            end
+            local Veh = deletecuotes(result[1].vehicle)
+            Data = {
+                Owner = result[1].owner,
+                Color = result[1].color,
+                VehicleName = Veh,
+                Category = QBCore.Shared.Vehicles[Veh].category,
+                Brand = QBCore.Shared.Vehicles[Veh].brand
+            }
+            cb(Data)
+        end)
+
+
 end)
 
 QBCore.Functions.CreateCallback("fx-mdt:server:GetPolices", function(source, cb)
@@ -277,3 +286,17 @@ QBCore.Functions.CreateCallback("fx-mdt:server:GetPolices", function(source, cb)
     cb(Polices)
 end)
 
+QBCore.Functions.CreateCallback("fx-mdt:server:SaveVehicleBolo",function(source,cb,data)
+local src = source
+    QBCore.Debug(data)
+    MySQL.Sync.insert("INSERT INTO fx_vehiclereports (id,plate,citizenid,color,vehicle,brand,category,information) VALUES (?,?,?,?,?,?,?,?)",
+    {
+        data.ID,data.Plate,data.Owner,data.Color,data.VehicleName,data.Brand,data.Category,data.Information
+    })
+end)
+TriggerLatent
+QBCore.Functions.CreateCallback("fx-mdt:server:GetVehicleBolos",function(source,cb)
+local VehiclesBolos = GetVehicleBolos()
+QBCore.Debug(VehiclesBolos)
+cb(VehiclesBolos)
+end)

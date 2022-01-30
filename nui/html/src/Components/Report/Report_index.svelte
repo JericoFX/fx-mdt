@@ -1,7 +1,6 @@
 <script lang="ts">
   import StepWizard from 'svelte-step-wizard';
   import {addToast} from 'as-toast';
-  import {fade, slide} from 'svelte/transition';
   import {push} from 'svelte-spa-router';
   import {v4 as uuid4} from 'uuid';
   import {IS_VISIBLE} from '../../store/store';
@@ -9,14 +8,11 @@
   import Fines from '../Fines/Fines_modal.svelte';
   import PolicesGet from './Report_get_polices.svelte';
   $: container = 1;
-  $: amount = 0;
-  $: jailTime = 0;
   export let params = {};
   const updateContainer = (id: number) => {
     container = id;
   };
   let open = false;
-  let displayed = 'block';
   let Info = {
     ID: uuid4(),
     name: '',
