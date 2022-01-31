@@ -11,6 +11,10 @@ fetchNui("getVehicleBolos").then((cb) =>{
 		Bolos = cb
 	}
 })
+
+const veh = () =>{
+	
+}
 </script>
 
 <div class="container absolute-center">
@@ -40,7 +44,7 @@ fetchNui("getVehicleBolos").then((cb) =>{
 							<td>{veh.citizenid}</td>
 							<td><span class=" badge full-width" style={`background:${veh.color}`}></span>	</td>
 							<!-- <td>></span></td> -->
-							<th><button   class="btn btn-sm text-center">Open Report</button></th>
+							<th><button  on:click="{veh}" class="btn btn-sm text-center">Open Report</button></th>
 						</tr>
 						{/each}
 					
@@ -52,7 +56,7 @@ fetchNui("getVehicleBolos").then((cb) =>{
 		</div>
 	</div>
 	<button  class="btn btn-wide btn-lg absolute-bottom" style="left:5%;bottom:0.5%;"> Add Report </button>
-	<button on:click="{() => push("/")}" class="btn btn-wide btn-lg absolute-bottom" style="left:88.5%;bottom:0.5%;"> Close </button>
+	<button on:click="{() => push("/")}" class="btn btn-wide btn-lg absolute-bottom" style="left:73%;bottom:0.5%;"> Close </button>
 </div>
 
 <style>
@@ -68,7 +72,7 @@ fetchNui("getVehicleBolos").then((cb) =>{
     position: absolute;
     width: 90%;
     height: 90%;
-		top:48%;
+		top:46%;
     background: #151415;
     box-shadow: 0px 4px 4px #000000, inset 0px 4px 4px rgba(255, 255, 255, 0.06);
     border-radius: 10px;

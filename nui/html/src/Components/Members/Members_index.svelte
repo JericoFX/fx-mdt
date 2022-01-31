@@ -210,7 +210,7 @@
 								<div class="Vehicles VandH hide-scrollbar" />
 							</div>
 
-							<div class="Casos absolute-bottom" style="position: absolute;      width: 664px;      height: 138px;left:17%;">
+							<div class="Casos absolute-bottom scroll hide-scrollbar" style="position: absolute;      width: 664px;      height: 138px;left:17%;">
 								<div class="box" style="position: absolute;width: 664px;height: 111px;background: #191921; box-shadow: 0px 4px 4px #000000, inset 0px 4px 4px #000000;
 								border-radius: 10px;">
 								<div class="fit">

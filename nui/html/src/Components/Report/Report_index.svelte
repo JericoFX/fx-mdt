@@ -32,7 +32,7 @@
   let block = false;
   let locationblock = false;
   const sendData = () => {
-    fetchNui('sendVehicleData', {Info}).then((cb) => {
+    fetchNui('sendReport', {Info}).then((cb) => {
       addToast('Reporte Creado con Exito', 'info');
     });
     setTimeout(() => {

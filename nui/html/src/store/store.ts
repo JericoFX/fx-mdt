@@ -7,3 +7,5 @@ export const PolicesOnCount = writable([]) // Polices Online on Duty
 export const Vehicles = writable([]) // VehiclesBolos
 export const ImagesReport = writable([]) // Report Images
 export const IS_VISIBLE = writable(false)
+export const Reports = writable([])
+export const Evidence = writable([])

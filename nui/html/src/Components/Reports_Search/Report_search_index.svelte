@@ -5,6 +5,7 @@
   import Report_Evidence from '../Report/Report_Evidence.svelte';
   let Data = [];
   let OpenModal = false;
+
   fetchNui('getReports', {}).then((cb) => {
     if (cb) {
       Data = cb;
@@ -40,7 +41,7 @@
 <div class="group_12_72_28 absolute-center">
   <div class="bodyapp_71_12" />
   <div class="body_71_13">
-    <div class="fit">
+    <div class="fit scroll hide-scrollbar">
       <table class="table table-zebra " style="width:100%">
         <thead>
           <tr>
@@ -67,9 +68,9 @@
       </table>
     </div>
   </div>
-  <div on:click={() => push('/')} class="atras_71_14" />
-
-  <div class="siguiente_71_20" />
+  <div on:click={() => push('/')} class="atras_71_14">
+    <span class="text-center text-h6 absolute-center">Cerrar</span>
+  </div>
 </div>
 <div id="id" />
 

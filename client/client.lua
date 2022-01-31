@@ -1,6 +1,6 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local OnDutyPolices = 0
-local PoliceInfo = {}
+local PoliceReports = {}
 CreateThread(function()
     Wait(100)
     TriggerServerEvent("fx-mdt:server:GetPolicesOnDuty")
@@ -29,7 +29,7 @@ end
 
 RegisterCommand("jericofxs", function(source, args) OpenData() end, false)
 
-RegisterNUICallback("sendVehicleData", function(data, cb)
+RegisterNUICallback("sendReport", function(data, cb)
     local Datos = data.Info
     TriggerServerEvent("fx-mdt:server:InsertReport", Datos)
     cb({})
@@ -38,12 +38,10 @@ RegisterNUICallback("TakePhoto", function(data, cb)
     SetNuiFocus(false, false)
     takePhoto = true
     while takePhoto do
-
         if IsControlJustPressed(1, 177) then -- CANCEL
             OpenData()
             cb(json.encode({url = nil}))
             takePhoto = false
-
             break
         elseif IsControlJustPressed(1, 176) then -- TAKE.. PIC
             QBCore.Functions.TriggerCallback("fx-mdt:server:GetWebhook",
@@ -106,16 +104,17 @@ RegisterNUICallback("getClosesPlayerInfo", function(data, cb)
     end
 end)
 RegisterNUICallback("getPlayerSearch", function(data, cb)
-    print(data.SearchName)
     local Name = tostring(data.SearchName)
     QBCore.Functions.TriggerCallback("fx-mdt:GetPlayerInfo",
-                                     function(d) cb(d) end, Name)
+                                     function(d)
+                                        cb(d) end, Name)
 end)
 RegisterNUICallback("getReports", function(data, cb)
     QBCore.Functions.TriggerCallback("fx-mdt:server:GetReports",
                                      function(d) cb(d) end, data.ID)
 end)
 RegisterNUICallback("getEvidence", function(data, cb)
+
     QBCore.Functions.TriggerCallback("fx-mdt:server:GetEvidence",
                                      function(d) cb(d) end)
 end)

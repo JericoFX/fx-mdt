@@ -2,7 +2,7 @@
   import Router, {push} from 'svelte-spa-router';
   import routes from './utils/router';
   import {fetchNui} from './utils/fetchNui';
-  import {Name, OnDuty, PolicesOnDuty, Rank, PolicesOnCount, IS_VISIBLE} from './store/store';
+  import {Name, OnDuty, PolicesOnDuty, Rank, PolicesOnCount, IS_VISIBLE, Reports} from './store/store';
   import {useNuiEvent} from './utils/useNuiEvent';
   $: displayed = 'none';
   $: if ($IS_VISIBLE) {
@@ -41,10 +41,11 @@
     $OnDuty = !$OnDuty;
     fetchNui('changeDuty', {Duty: $OnDuty});
   };
+
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
-<div style={'display:' + displayed}>
+{#if $IS_VISIBLE}
   <div class="container fixed-center2 non-selectable">
     <div class="bodyApp fixed-center">
       <img src="iconos/back.jpg" style:border-radius="25px" class="fit" alt="" />
@@ -111,7 +112,7 @@
       </div>
     </div>
   </div>
-</div>
+{/if}
 
 <style global>
   :root {

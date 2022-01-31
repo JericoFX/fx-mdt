@@ -5,12 +5,8 @@
   export let open = false;
   export let table = [];
   let FinesAdded = table;
-let jerico = false
   const sendData = (e) => {
-
-      FinesAdded.push(e);
-
-
+    FinesAdded.push(e);
     FinesAdded = FinesAdded;
   };
   const closeModal = () => {
@@ -37,7 +33,7 @@ let jerico = false
             {#each Fines as fin}
               <tr class="hover">
                 <th>
-                  <input on:click={() => sendData(fin)}  type="checkbox" name="" id="" />
+                  <input on:click={() => sendData(fin)} type="checkbox" name="" id="" />
                 </th>
                 <th>{fin.id}</th>
                 <td>{fin.label}</td>
