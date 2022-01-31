@@ -5,9 +5,8 @@
   export let text = '';
   const closeModa = () => {
     open = false;
-    dispatch('closedModal',{text});
+    dispatch('closedModal',{open});
   };
-  $: console.log(open);
 </script>
 
 {#if open}
@@ -16,6 +15,7 @@
     <div class="container absolute-center" style:background="#151415">
       <div class="inputcontainer absolute-center" style:width="100%" style:height="100%">
         <textarea bind:value="{text}"
+        disabled
           class="absolute-center"
           name="jerico"
           id=""
@@ -23,6 +23,10 @@
           rows="3"
           style="    width: 80%;
       height: 80%;
+      max-width: 80%;
+      min-width: 80%;
+      max-height: 80%;
+      min-height: 80%;
       top: 43%;
       border-radius: 5px;background:#343441;"
         />
