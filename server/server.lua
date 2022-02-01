@@ -335,6 +335,33 @@ RegisterNetEvent("fx-mdt:server:BloodMenu", function()
     end
 end)
 
+function GetPolicesToSend()
+    local Polices = QBCore.Functions.GetQBPlayers()
+    for k,v in ipairs(Polices) do
+        local element = Polices[k]
+        if element.PlayerData.job.name == "police" then
+            return element.PlayerData.source
+        end
+    end
+    -- body
+end
+
+RegisterNetEvent("fx-mdt:server:SaveVehicleBolo",function ( data )
+      local src = source
+      local Polices = GetPolicesToSend()
+
+    MySQL.Sync.insert("INSERT INTO fx_vehiclereports (id,plate,citizenid,color,vehicle,brand,category,information) VALUES (?,?,?,?,?,?,?,?)",
+        {
+            data.ID, data.Plate, data.Owner, data.Color, data.VehicleName,
+            data.Brand, data.Category, data.Information
+        })
+      for i = 0,#Polices do
+             TriggerClientEvent("fx-mdt:client:SaveVehicleBolo",Polices[i],data)
+      end
+
+    -- body
+end)
+
 -- RegisterNetEvent("fx-mdt:server:GetBlood", function()
 --     local dato = {}
 --     if IsPolice(source) then

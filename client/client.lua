@@ -128,12 +128,27 @@ RegisterNUICallback("getPolices", function(data, cb)
     QBCore.Functions.TriggerCallback("fx-mdt:server:GetPolices",
                                      function(d) cb(d) end)
 end)
+
 RegisterNUICallback("saveVehicleBolo", function(data, cb)
     local Data = data.Vehiculo
-    QBCore.Functions.TriggerCallback("fx-mdt:server:SaveVehicleBolo",
-                                     function(d) cb(d) end, Data)
+    --Add Trigger Server Event
+    TriggerServerEvent("fx-mdt:server:SaveVehicleBolo",Data)
+    -- QBCore.Functions.TriggerCallback("fx-mdt:server:SaveVehicleBolo",
+    --                                  function(d) cb(d) end, Data)
 end)
 RegisterNUICallback("getVehicleBolos", function(data, cb)
     QBCore.Functions.TriggerCallback("fx-mdt:server:GetVehicleBolos",
                                      function(d) cb(d) end)
+end)
+
+RegisterNetEvent("fx-mdt:client:SendBolos",function( data )
+    assert(type(data) === "table","Wrong format expected table get %"):format(type(data))
+
+    SendNUIMessage({
+        action="addVehicleBolo",
+        data={
+            vehicleBolos=data
+        }
+    })
+    -- body
 end)

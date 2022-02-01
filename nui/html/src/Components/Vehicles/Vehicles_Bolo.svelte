@@ -2,17 +2,18 @@
   import {createEventDispatcher} from 'svelte';
   import {push} from 'svelte-spa-router';
   import {fetchNui} from '../../utils/fetchNui';
+  import {Vehicles_Report} from "../../store/store"
   import VehicleInfo from './Vehicle_Information.svelte';
+
   const dispatch = createEventDispatcher();
   let open = false;
   let Bolos = [];
-  fetchNui('getVehicleBolos').then((cb) => {
-    if (cb) {
-      console.log(JSON.stringify(cb));
-
-      Bolos = cb;
-    }
-  });
+  // fetchNui('getVehicleBolos').then((cb) => {
+  //   if (cb) {
+  //     console.log(JSON.stringify(cb));
+  //     Bolos = cb;
+  //   }
+  // });
 
   const veh1 = (info: string) => {
     open = true;
@@ -47,7 +48,7 @@
             </tr>
           </thead>
           <tbody>
-            {#each Bolos as veh}
+            {#each $Vehicles_Report as veh}
               <tr>
                 <td>-</td>
                 <td>{veh.plate}</td>
@@ -55,7 +56,6 @@
                 <td>{veh.brand}</td>
                 <td>{veh.citizenid}</td>
                 <td><span class=" badge full-width" style={`background:${veh.color}`} /> </td>
-                <!-- <td>></span></td> -->
                 <th><button on:click={() => veh1(veh.information)} class="btn btn-sm text-center">Open Report</button></th>
               </tr>
             {/each}

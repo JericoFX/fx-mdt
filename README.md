@@ -47,3 +47,32 @@ Special thanks to TASO! and Project Error for his NUI boilerplate
 # License
 
 	MIT
+
+
+# SQL
+
+```sql
+	CREATE TABLE `fx_reports` (
+	`id` TINYTEXT NOT NULL COLLATE 'utf8_general_ci',
+	`citizenid` TINYTEXT NOT NULL COLLATE 'utf8_general_ci',
+	`name` CHAR(50) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`lastname` CHAR(50) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`location` CHAR(70) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`vehicleplate` VARCHAR(15) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`information` LONGTEXT NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`evidencia` LONGTEXT NULL DEFAULT NULL COLLATE 'utf8mb4_bin',
+	`imagenes` LONGTEXT NULL DEFAULT NULL COLLATE 'utf8mb4_bin',
+	`fine` LONGTEXT NULL DEFAULT NULL COLLATE 'utf8mb4_bin',
+	`policesinvolved` LONGTEXT NULL DEFAULT NULL COLLATE 'utf8mb4_bin',
+	`jailtime` TINYINT(4) NULL DEFAULT NULL,
+	`amount` TINYINT(4) NULL DEFAULT NULL,
+	CONSTRAINT `evidencia` CHECK (json_valid(`evidencia`)),
+	CONSTRAINT `imagenes` CHECK (json_valid(`imagenes`)),
+	CONSTRAINT `fine` CHECK (json_valid(`fine`)),
+	CONSTRAINT `policesinvolved` CHECK (json_valid(`policesinvolved`))
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;
+
+```

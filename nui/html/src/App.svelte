@@ -2,7 +2,7 @@
   import Router, {push} from 'svelte-spa-router';
   import routes from './utils/router';
   import {fetchNui} from './utils/fetchNui';
-  import {Name, OnDuty, PolicesOnDuty, Rank, PolicesOnCount, IS_VISIBLE, Reports} from './store/store';
+  import {Name, OnDuty, PolicesOnDuty, Rank, PolicesOnCount, IS_VISIBLE, Reports,Vehicles_Report} from './store/store';
   import {useNuiEvent} from './utils/useNuiEvent';
   $: displayed = 'none';
   $: if ($IS_VISIBLE) {
@@ -41,6 +41,10 @@
     $OnDuty = !$OnDuty;
     fetchNui('changeDuty', {Duty: $OnDuty});
   };
+ useNuiEvent('addVehicleBolo', ({vehicleBolos}) => {
+    $Vehicles_Report = vehicleBolos
+  });
+
 
 </script>
 

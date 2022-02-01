@@ -1,39 +1,51 @@
 <script lang="ts">
-  import {createEventDispatcher} from 'svelte';
+  import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher();
   export let open = false;
-  export let text = '';
+  export let text = "";
   const closeModa = () => {
     open = false;
-    dispatch('closedModal',{open});
+    dispatch("closedModal", { open });
   };
 </script>
 
 {#if open}
-  <div class="modal-overlay">
-    <div class="my-back fit" />
-    <div class="container absolute-center" style:background="#151415">
-      <div class="inputcontainer absolute-center" style:width="100%" style:height="100%">
-        <textarea bind:value="{text}"
+<div class="modal-overlay">
+  <div class="my-back fit" />
+  <div class="container absolute-center" style:background="#151415">
+    <div
+      class="inputcontainer absolute-center"
+      style:width="100%"
+      style:height="100%"
+    >
+      <textarea
+        bind:value="{text}"
         disabled
-          class="absolute-center"
-          name="jerico"
-          id=""
-          cols="2"
-          rows="3"
-          style="    width: 80%;
-      height: 80%;
-      max-width: 80%;
-      min-width: 80%;
-      max-height: 80%;
-      min-height: 80%;
-      top: 43%;
-      border-radius: 5px;background:#343441;"
-        />
-      </div>
-      <button on:click={closeModa} class="btn absolute-bottom" style:left="42%">CloseModal</button>
+        class="absolute-center"
+        name="jerico"
+        id=""
+        cols="2"
+        rows="3"
+        style="
+          width: 80%;
+          height: 80%;
+          max-width: 80%;
+          min-width: 80%;
+          max-height: 80%;
+          min-height: 80%;
+          top: 43%;
+          border-radius: 5px;
+          background: #343441;
+          box-shadow: 0px 4px 4px #000000,
+            inset 0px 4px 4px rgba(255, 255, 255, 0.06);
+        "
+      />
     </div>
+    <button on:click="{closeModa}" class="btn absolute-bottom" style:left="42%">
+      CloseModal
+    </button>
   </div>
+</div>
 {/if}
 
 <style>

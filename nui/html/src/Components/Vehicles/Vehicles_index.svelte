@@ -23,13 +23,12 @@
     
     fetchNui('getVehicleData', {Placa}).then((cb) => {
       if (cb) {
-        console.log(JSON.stringify(cb));
-        
         Vehiculo.Owner = cb.Owner;
         (Vehiculo.Color = getColorHex(cb.Color)), (Vehiculo.Brand = cb.Brand), (Vehiculo.VehicleName = cb.VehicleName), (Vehiculo.Category = cb.Category);
       }
     });
   };
+
   const getColorHex = (color: string): string => {
     return Colores.filter((col) => col.ID === color.toString())[0].Hex;
   };
