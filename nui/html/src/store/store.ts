@@ -9,3 +9,4 @@ export const ImagesReport = writable([]) // Report Images
 export const IS_VISIBLE = writable(false)
 export const Reports = writable([])
 export const Evidence = writable([])
+export const IsBoss = writable(false)

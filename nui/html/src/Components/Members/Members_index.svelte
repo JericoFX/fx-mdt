@@ -17,10 +17,10 @@
 	let Citizenid = "";
 	let Casos = []
 	let Casas = []
-	$Vehicles.length = 0
+	let Vehicles = []
 
 	const searchData = () => {
-		$Vehicles.length = 0
+		Vehicles.length = 0
 		openModal = true;
 		const Div = document.getElementById('id');
 		fetchNui('getPlayerSearch', {SearchName}).then((cb) => {
@@ -33,14 +33,15 @@
 					},
 				});
 				m.$on('playerSelected', (data) => {
+
 					const Dato = data.detail.data
-					console.log(JSON.stringify(Dato))
+
 					Name = Dato.Name.replaceAll('"', '');
 					LastName = Dato.LastName.replaceAll('"', '');
 					JobName = Dato.JobName.replaceAll('"', '');
 					Rank = Dato.Rank.replaceAll('"', '');
 					Citizenid = Dato.CitizenID.replaceAll('"', '');
-					$Vehicles = Dato.Vehicles;
+					Vehicles = Dato.Vehicles;
 					Casas = Dato.Houses;
 					Casos = Dato.Casos;
 					openModal = false;
@@ -54,12 +55,12 @@
 	const addClosePlayerInfo = () => {
 		fetchNui('getClosesPlayerInfo').then((cb) => {
 			if (cb) {
-				$Vehicles.length = 0
+				Vehicles.length = 0
 				Name =  cb.name.replaceAll('"', '');;
 				LastName =  cb.lastname.replaceAll('"', '');;
 				JobName = cb.Job.replaceAll('"', '');;
 				Rank = cb.Rank.replaceAll('"', '');
-				$Vehicles = cb.Vehicles
+				Vehicles = cb.Vehicles
 			}
 		});
 	};
@@ -75,12 +76,12 @@
 			}
 		})
 		m.$on('playerSelected', () => {
-
 			openModal = false;
 		});
 	}
 
 	const addReport = () =>{
+		//console.log(`/Reports/${Name}/${LastName}/${Citizenid}`)
 		push(`/Reports/${Name}/${LastName}/${Citizenid}`)
 	}
 
@@ -191,7 +192,7 @@
 												</tr>
 											</thead> 
 											<tbody>
-												{#each $Vehicles as veh}
+												{#each Vehicles as veh}
 												<tr on:click="{() => showVehicleData(veh)}">
 													<td>{veh.vehicle}</td> 
 													<td>{veh.plate}</td> 

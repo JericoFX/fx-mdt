@@ -21,11 +21,12 @@
   const handleClick = (name: string) => {
     push(`/${name}`);
   };
-  useNuiEvent('openMDT', ({visible, name, onDuty, rank}) => {
+  useNuiEvent('openMDT', ({visible, name, onDuty, rank,isBoss}) => {
     $IS_VISIBLE = visible;
     $Name = name;
     $OnDuty = onDuty;
     $Rank = rank;
+    $isBoss = isBoss;
   });
   useNuiEvent('onDutyPolices', ({policesOnDuty, policesData}) => {
     $PolicesOnDuty = policesOnDuty;
@@ -43,6 +44,9 @@
   };
  useNuiEvent('addVehicleBolo', ({vehicleBolos}) => {
     $Vehicles_Report = vehicleBolos
+  });
+  useNuiEvent('sendReport', ({reports}) => {
+    $Reports = reports
   });
 
 

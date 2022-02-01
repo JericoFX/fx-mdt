@@ -75,10 +75,12 @@ function GetAllReports(id)
     local Data = {}
     local reports
     if id then
-        reports = MySQL.scalar.await(
-                      "SELECT id,citizenid,name,lastname,location,vehicleplate,information,evidencia, imagenes FROM fx_reports WHERE citizenid = ?",
+        reports = MySQL.Sync.fetchAll("SELECT * FROM fx_reports WHERE citizenid = ?",
                       {id})
-        if reports then return reports end
+        if reports then 
+            print(json.encode(reports))
+            return reports
+        end
 
     else
         reports = MySQL.query.await("SELECT * FROM fx_reports")
@@ -93,16 +95,19 @@ function GetAllReports(id)
                     vehicleplate = element.vehicleplate,
                     information = element.information,
                     evidencia = json.decode(element.evidencia),
-                    imagenes = json.decode(element.imagenes)
+                    imagenes = json.decode(element.imagenes),
+                    fine = json.decode(element.fine),
+                    policesinvolved = json.decode(element.policesinvolved),
+                    jailtime = element.jailtime,
+                    amount = element.amount
                 }
                
             end
-            return Data
+        
         end
 
     end
-
-
+    return Data
 end
 
 function IsPolice(src)
@@ -201,15 +206,13 @@ RegisterNetEvent("fx-mdt:server:InsertReport", function(data)
                 json.encode(data.fines), json.encode(data.polices),
                 data.jailTime, data.amount
             })
+    Reports = data
+    TriggerClientEvent("fx-mdt:client:onCreatedReport",-1,Reports)
     end
-    TriggerEvent("fx-mdt:server:GetReports")
 end)
 
 RegisterNetEvent("fx-mdt:server:GetReports",function()
-    local Reports = GetAllReports()
-    Wait(100)
-    GlobalState.reports = Reports
-    TriggerClientEvent("fx-mdt:client:onCreatedReport",-1)
+    TriggerClientEvent("fx-mdt:client:onCreatedReport",-1,Reports) --DONT SEND TO EVERYONE!
 end)
 
 

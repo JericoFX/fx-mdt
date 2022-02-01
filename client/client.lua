@@ -16,13 +16,15 @@ RegisterNetEvent("fx-mdt:client:GetPolicesOnDuty",
 end)
 
 function OpenData()
-    local Name = QBCore.Functions.GetPlayerData().charinfo.firstname .. " " ..
-                     QBCore.Functions.GetPlayerData().charinfo.lastname
-    local Rank = QBCore.Functions.GetPlayerData().job.grade.name
-    local OnDuty = QBCore.Functions.GetPlayerData().job.onduty
+    local PlayerData = QBCore.Functions.GetPlayerData()
+    local Name = PlayerData.charinfo.firstname .. " " ..
+                     PlayerData.charinfo.lastname
+    local Rank = PlayerData.job.grade.name
+    local OnDuty = PlayerData.job.onduty
+    local isboss = PlayerData.job.isboss
     SendNUIMessage({
         action = "openMDT",
-        data = {visible = true, name = Name, onDuty = OnDuty, rank = Rank}
+        data = {visible = true, name = Name, onDuty = OnDuty, rank = Rank,isBoss = isboss}
     })
     SetNuiFocus(true, true)
 end
@@ -70,7 +72,7 @@ RegisterNUICallback("TakePhoto", function(data, cb)
     end
     Wait(100)
     SetNuiFocus(true, true)
-end)
+end) --MISSING CANCEL ALL ACTIONS ON PICTURE
 
 RegisterNUICallback("exitMDT", function(data, cb)
     SetNuiFocus(false, false)
@@ -113,6 +115,16 @@ RegisterNUICallback("getReports", function(data, cb)
     QBCore.Functions.TriggerCallback("fx-mdt:server:GetReports",
                                      function(d) cb(d) end, data.ID)
 end)
+RegisterNetEvent("fx-mdt:client:onCreatedReport",function(data)
+    assert(type(data) == "table","Wrong format expected table get %"):format(type(data))
+    SendNUIMessage({
+        action="sendReport",
+        data = {
+            reports = data
+        }
+    })
+
+end)
 RegisterNUICallback("getEvidence", function(data, cb)
 
     QBCore.Functions.TriggerCallback("fx-mdt:server:GetEvidence",
@@ -142,7 +154,7 @@ RegisterNUICallback("getVehicleBolos", function(data, cb)
 end)
 
 RegisterNetEvent("fx-mdt:client:SendBolos",function( data )
-    assert(type(data) === "table","Wrong format expected table get %"):format(type(data))
+    assert(type(data) == "table","Wrong format expected table get %"):format(type(data))
 
     SendNUIMessage({
         action="addVehicleBolo",

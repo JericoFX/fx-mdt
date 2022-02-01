@@ -1,16 +1,17 @@
 <script lang="ts">
   import {push} from 'svelte-spa-router';
   import {fetchNui} from '../../utils/fetchNui';
+  import {Reports} from "../../store/store"
   import Report_Modal from './Report_Modal.svelte';
   import Report_Evidence from '../Report/Report_Evidence.svelte';
   let Data = [];
   let OpenModal = false;
 
-  fetchNui('getReports', {}).then((cb) => {
-    if (cb) {
-      Data = cb;
-    }
-  });
+  // fetchNui('getReports', {}).then((cb) => {
+  //   if (cb) {
+  //     Data = cb;
+  //   }
+  // });
   const openReportModal = (data) => {
     OpenModal = true;
     const Div = document.getElementById('id');
@@ -36,6 +37,7 @@
     });
     m.$on('closeModal', () => (OpenModal = false));
   };
+  
 </script>
 
 <div class="group_12_72_28 absolute-center">
@@ -54,7 +56,7 @@
           </tr>
         </thead>
         <tbody>
-          {#each Data as players}
+          {#each $Reports as players}
             <tr>
               <th>{players.name}</th>
               <td>{players.lastname}</td>
