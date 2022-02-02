@@ -2,7 +2,7 @@
   import {createEventDispatcher} from 'svelte';
   import {push} from 'svelte-spa-router';
   import {fetchNui} from '../../utils/fetchNui';
-  import {Vehicles_Report} from "../../store/store"
+  import {Vehicles_Report,isBoss} from "../../store/store"
   import VehicleInfo from './Vehicle_Information.svelte';
 
   const dispatch = createEventDispatcher();
@@ -44,7 +44,12 @@
               <th>Owner</th>
               <th>Color</th>
               <th>Report</th>
-              <th />
+              {#if $isBoss}
+               <th>Delete</th>
+               {:else}
+               <th />
+              {/if}
+             
             </tr>
           </thead>
           <tbody>
@@ -57,6 +62,12 @@
                 <td>{veh.citizenid}</td>
                 <td><span class=" badge full-width" style={`background:${veh.color}`} /> </td>
                 <th><button on:click={() => veh1(veh.information)} class="btn btn-sm text-center">Open Report</button></th>
+                  {#if $isBoss}
+                <th><button on:click={() => veh1(veh.information)} class="btn btn-sm text-center">Delete</button></th>
+               {:else}
+               <th />
+              {/if}
+               
               </tr>
             {/each}
           </tbody>

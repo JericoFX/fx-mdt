@@ -1,8 +1,10 @@
 <script lang="ts">
+  import {fade} from 'svelte/transition';
+  import {Name, OnDuty, PolicesOnDuty, Rank, PolicesOnCount, IS_VISIBLE, Reports,Vehicles_Report,isBoss} from './store/store';
   import Router, {push} from 'svelte-spa-router';
   import routes from './utils/router';
   import {fetchNui} from './utils/fetchNui';
-  import {Name, OnDuty, PolicesOnDuty, Rank, PolicesOnCount, IS_VISIBLE, Reports,Vehicles_Report} from './store/store';
+
   import {useNuiEvent} from './utils/useNuiEvent';
   $: displayed = 'none';
   $: if ($IS_VISIBLE) {
@@ -21,12 +23,12 @@
   const handleClick = (name: string) => {
     push(`/${name}`);
   };
-  useNuiEvent('openMDT', ({visible, name, onDuty, rank,isBoss}) => {
+  useNuiEvent('openMDT', ({visible, name, onDuty, rank,isboss}) => {
     $IS_VISIBLE = visible;
     $Name = name;
     $OnDuty = onDuty;
     $Rank = rank;
-    $isBoss = isBoss;
+    $isBoss = isboss;
   });
   useNuiEvent('onDutyPolices', ({policesOnDuty, policesData}) => {
     $PolicesOnDuty = policesOnDuty;
@@ -42,9 +44,12 @@
     $OnDuty = !$OnDuty;
     fetchNui('changeDuty', {Duty: $OnDuty});
   };
+
  useNuiEvent('addVehicleBolo', ({vehicleBolos}) => {
     $Vehicles_Report = vehicleBolos
+    console.log(JSON.stringify(vehicleBolos))
   });
+
   useNuiEvent('sendReport', ({reports}) => {
     $Reports = reports
   });
@@ -54,6 +59,7 @@
 
 <svelte:window on:keydown={handleKeydown} />
 {#if $IS_VISIBLE}
+<div class="transition" transition:fade>
   <div class="container fixed-center2 non-selectable">
     <div class="bodyApp fixed-center">
       <img src="iconos/back.jpg" style:border-radius="25px" class="fit" alt="" />
@@ -119,6 +125,7 @@
         <p class=" absolute-center text-center">{$OnDuty ? 'OUT Duty' : 'In Duty'}</p>
       </div>
     </div>
+  </div>
   </div>
 {/if}
 

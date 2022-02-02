@@ -8,23 +8,20 @@
   import {v4 as uuid4} from 'uuid';
   let open = false
   $: Vehiculo = {
-    ID: uuid4(),
-    Owner: '',
-    Plate: "",
-    Color: '',
-    Brand: '',
-    Category: '',
-    VehicleName: '',
-    Information: ""
+    id: uuid4(),
+    citizenid: '',
+    plate: "",
+    color: '',
+    brand: '',
+    category: '',
+    vehicle: '',
+    information: ""
   };
-  $: Placa = Vehiculo.Plate
+  $: Placa = Vehiculo.plate
   const getVehicleByPlate = () => {
-    console.log(Placa);
-    
     fetchNui('getVehicleData', {Placa}).then((cb) => {
       if (cb) {
-        Vehiculo.Owner = cb.Owner;
-        (Vehiculo.Color = getColorHex(cb.Color)), (Vehiculo.Brand = cb.Brand), (Vehiculo.VehicleName = cb.VehicleName), (Vehiculo.Category = cb.Category);
+        ((Vehiculo.citizenid = cb.Citizenid),Vehiculo.color = getColorHex(cb.Color)), (Vehiculo.brand = cb.Brand), (Vehiculo.vehicle = cb.VehicleName), (Vehiculo.category = cb.Category);
       }
     });
   };
@@ -43,9 +40,9 @@
       }
     })
   m.$on("closedModal",(data) =>{
-    Vehiculo.Information = data.detail.text 
+    Vehiculo.information = data.detail.text 
     fetchNui("saveVehicleBolo",{Vehiculo}).then((cb) =>{
-      push("/")
+     
     })
   })
     //Vehiculo
@@ -61,7 +58,7 @@
       <p class="absolute-center" style="top:8%;font-size:4rem">VEHICLES</p>
       <div class="Consiencia" style=" top: 3%;    width: 100%;    position: absolute;    height: 100%;">
         <div class="buttonbody absolute-center" style:top="15%">
-          <input type="text" bind:value={Vehiculo.Plate} class="buttontext absolute-right text-center text-subtitle1 text-uppercase text-black text-bold" />
+          <input type="text" bind:value={Vehiculo.plate} class="buttontext absolute-right text-center text-subtitle1 text-uppercase text-black text-bold" />
           <div on:click={getVehicleByPlate} class="icon">
             <img alt="asd" src="iconos/search.png" class="absolute-right icon" style="left: 101%;width: 33px;top: 5%;border-radius: 10px;" />
           </div>
@@ -71,35 +68,35 @@
         </div>
         <div class="separator absolute-center" style:top="22.5%" />
         <div class="buttonbody absolute-center" style:top="30%">
-          <input type="text" bind:value={Vehiculo.Owner} class="buttontext absolute-right text-center text-black text-bold text-h6 text-capitalize" />
+          <input disabled type="text" bind:value={Vehiculo.citizenid} class="buttontext absolute-right text-center text-black text-bold text-h6 text-capitalize" />
           <div class="text">
             <span class="absolute-left customize" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Owner</span>
           </div>
         </div>
         <div class="separator absolute-center" style:top="37.5%" />
         <div class="buttonbody absolute-center" style:top="45%">
-          <div class="buttontext absolute-right text-center" style={'background:' + Vehiculo.Color + ';'} />
+          <div class="buttontext absolute-right text-center" style={'background:' + Vehiculo.color + ';'} />
           <div class="text">
             <span class="absolute-left customize">Color</span>
           </div>
         </div>
         <div class="separator absolute-center" style:top="52.5%" />
         <div class="buttonbody absolute-center" style:top="60%">
-          <input disabled type="text" bind:value={Vehiculo.VehicleName} class="buttontext absolute-right text-center text-capitalize text-black" />
+          <input disabled type="text" bind:value={Vehiculo.vehicle} class="buttontext absolute-right text-center text-capitalize text-black" />
           <div class="text">
             <span class="absolute-left" style="left:5%;color:white;top:25%;font-size: 18px;">Vehicle Name</span>
           </div>
         </div>
         <div class="separator absolute-center" style:top="67.5%" />
         <div class="buttonbody absolute-center" style:top="75%">
-          <input disabled type="text" bind:value={Vehiculo.Brand} class="buttontext absolute-right text-center text-capitalize text-black" />
+          <input disabled type="text" bind:value={Vehiculo.brand} class="buttontext absolute-right text-center text-capitalize text-black" />
           <div class="text">
             <span class="absolute-left customize" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Brand</span>
           </div>
         </div>
         <div class="separator absolute-center" style:top="82.5%" />
         <div class="buttonbody absolute-center" style:top="90%">
-          <input disabled type="text" bind:value={Vehiculo.Category} class="buttontext absolute-right text-center text-capitalize text-black" />
+          <input disabled type="text" bind:value={Vehiculo.category} class="buttontext absolute-right text-center text-capitalize text-black" />
           <div class="text">
             <span class="absolute-left customize" style:font-size="18px" style:top="25%" style:color="white" style:left="10%">Category</span>
           </div>

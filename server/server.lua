@@ -1,14 +1,14 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local WebHook = ""
 local MDT = {}
-function MDT:Init()
-    local self = self
+function MDT.Init()
+    local self = {}
     setmetatable(self, MDT)
     return self
 end
 
 local Reports = {}
-
+local Bolos = {}
 QBCore.Functions.CreateCallback("fx-mdt:GetPlayerClosestInfo",
                                 function(source, cb, id)
     local Player = QBCore.Functions.GetPlayer(id)
@@ -75,10 +75,9 @@ function GetAllReports(id)
     local Data = {}
     local reports
     if id then
-        reports = MySQL.Sync.fetchAll("SELECT * FROM fx_reports WHERE citizenid = ?",
+        reports = MySQL.query.await("SELECT * FROM fx_reports WHERE citizenid = ?",
                       {id})
         if reports then 
-            print(json.encode(reports))
             return reports
         end
 
@@ -89,6 +88,7 @@ function GetAllReports(id)
                 local element = reports[k]
                 Data[#Data + 1] = {
                     name = element.name,
+                    owner = element.citizenid,
                     lastname = element.lastname,
                     id = element.id,
                     location = element.location,
@@ -152,7 +152,7 @@ end)
 QBCore.Functions.CreateCallback("fx-mdt:GetPlayerInfo", function(source, cb, id)
     local Data = {}
 
-    MySQL.query(
+   MySQL.query(
         "SELECT citizenid,JSON_EXTRACT(players.charinfo,'$.firstname') AS firstname, JSON_EXTRACT(players.charinfo,'$.lastname') AS lastname,JSON_EXTRACT(players.job,'$.grade.name') AS rank ,JSON_EXTRACT(players.job,'$.name') AS jobname, JSON_EXTRACT(players.charinfo,'$.phone') AS phone,  JSON_EXTRACT(players.job,'$.payment') AS payment FROM players  WHERE players.charinfo LIKE ? ",
         {string.lower('%' .. id .. '%')}, function(result)
             if result then
@@ -198,7 +198,7 @@ RegisterNetEvent("fx-mdt:server:InsertReport", function(data)
     local src = source
     local PolicesOnDuty, count = QBCore.Functions.GetPlayersOnDuty("police") -- lets send the information to the on line officers 
     if IsPolice(src) then
-        MySQL.Sync.insert("INSERT INTO fx_reports (id,citizenid,name,lastname,location,vehicleplate,information,evidencia,imagenes,fine,policesinvolved,jailtime,amount) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        MySQL.insert("INSERT INTO fx_reports (id,citizenid,name,lastname,location,vehicleplate,information,evidencia,imagenes,fine,policesinvolved,jailtime,amount) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
             {
                 data.ID, data.citizenID, data.name, data.lastName,
                 data.location, data.vehiclePlate, data.information,
@@ -263,7 +263,7 @@ QBCore.Functions.CreateCallback("fx-mdt:server:GetVehicleData",
     local src = source
     local Placa = plate
     local Data = {}
-    MySQL.query("SELECT citizenid AS owner, JSON_EXTRACT(mods,'$.color1') AS color,vehicle FROM player_vehicles WHERE plate = ?",
+    MySQL.query("SELECT citizenid, JSON_EXTRACT(mods,'$.color1') AS color,vehicle FROM player_vehicles WHERE plate = ?",
         {Placa}, function(result)
             if not result[1] then
                 TriggerClientEvent("QBCore:Notify", source, "No Vehicle Found")
@@ -272,7 +272,7 @@ QBCore.Functions.CreateCallback("fx-mdt:server:GetVehicleData",
             end
             local Veh = deletecuotes(result[1].vehicle)
             Data = {
-                Owner = result[1].owner,
+                Citizenid = result[1].citizenid,
                 Color = result[1].color,
                 VehicleName = Veh,
                 Category = QBCore.Shared.Vehicles[Veh].category,
@@ -289,15 +289,15 @@ QBCore.Functions.CreateCallback("fx-mdt:server:GetPolices", function(source, cb)
     cb(Polices)
 end)
 
-QBCore.Functions.CreateCallback("fx-mdt:server:SaveVehicleBolo",
-                                function(source, cb, data)
-    local src = source
-    MySQL.Sync.insert("INSERT INTO fx_vehiclereports (id,plate,citizenid,color,vehicle,brand,category,information) VALUES (?,?,?,?,?,?,?,?)",
-        {
-            data.ID, data.Plate, data.Owner, data.Color, data.VehicleName,
-            data.Brand, data.Category, data.Information
-        })
-end)
+-- QBCore.Functions.CreateCallback("fx-mdt:server:SaveVehicleBolo",
+--                                 function(source, cb, data)
+--     local src = source
+--     MySQL.Sync.insert("INSERT INTO fx_vehiclereports (id,plate,citizenid,color,vehicle,brand,category,information) VALUES (?,?,?,?,?,?,?,?)",
+--         {
+--             data.ID, data.Plate, data.Owner, data.Color, data.VehicleName,
+--             data.Brand, data.Category, data.Information
+--         })
+-- end)
 
 QBCore.Functions.CreateCallback("fx-mdt:server:GetVehicleBolos",
                                 function(source, cb)
@@ -352,19 +352,31 @@ end
 RegisterNetEvent("fx-mdt:server:SaveVehicleBolo",function ( data )
       local src = source
       local Polices = GetPolicesToSend()
-
-    MySQL.Sync.insert("INSERT INTO fx_vehiclereports (id,plate,citizenid,color,vehicle,brand,category,information) VALUES (?,?,?,?,?,?,?,?)",
+      Bolos[#Bolos+1] = data
+                MySQL.insert("INSERT INTO fx_vehiclereports (id,plate,citizenid,color,vehicle,brand,category,information) VALUES (?,?,?,?,?,?,?,?)",
         {
-            data.ID, data.Plate, data.Owner, data.Color, data.VehicleName,
-            data.Brand, data.Category, data.Information
+            data.id, data.plate, data.citizenid, data.color, data.vehicle,
+            data.brand, data.category, data.information
         })
-      for i = 0,#Polices do
-             TriggerClientEvent("fx-mdt:client:SaveVehicleBolo",Polices[i],data)
-      end
+  
+             TriggerClientEvent("fx-mdt:client:SaveVehicleBolo",-1,Bolos)
 
-    -- body
 end)
 
+
+
+CreateThread(function() 
+Wait(200)
+  TriggerEvent("fx-mdt:server:sendBolosToPlayers")
+end)
+
+RegisterNetEvent("fx-mdt:server:sendBolosToPlayers",function() 
+
+local bolos = GetVehicleBolos()
+Bolos = bolos
+TriggerClientEvent("fx-mdt:client:SaveVehicleBolo",-1,Bolos)
+
+end)
 -- RegisterNetEvent("fx-mdt:server:GetBlood", function()
 --     local dato = {}
 --     if IsPolice(source) then

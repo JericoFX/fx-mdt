@@ -5,7 +5,7 @@
   export let text = "";
   const closeModa = () => {
     open = false;
-    dispatch("closedModal", { open });
+    dispatch("closedModal", { text });
   };
 </script>
 
@@ -20,7 +20,7 @@
     >
       <textarea
         bind:value="{text}"
-        disabled
+        
         class="absolute-center"
         name="jerico"
         id=""

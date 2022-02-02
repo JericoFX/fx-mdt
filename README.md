@@ -76,3 +76,21 @@ ENGINE=InnoDB
 ;
 
 ```
+
+```sql
+CREATE TABLE `fx_vehiclereports` (
+	`id` CHAR(50) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`plate` CHAR(15) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`citizenid` CHAR(15) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`color` TINYTEXT NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`vehicle` CHAR(15) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`brand` CHAR(15) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`category` CHAR(15) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`information` LONGTEXT NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	INDEX `citizenid` (`citizenid`) USING BTREE
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;
+
+```

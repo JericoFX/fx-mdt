@@ -22,9 +22,10 @@ function OpenData()
     local Rank = PlayerData.job.grade.name
     local OnDuty = PlayerData.job.onduty
     local isboss = PlayerData.job.isboss
+    print(isboss)
     SendNUIMessage({
         action = "openMDT",
-        data = {visible = true, name = Name, onDuty = OnDuty, rank = Rank,isBoss = isboss}
+        data = {visible = true, name = Name, onDuty = OnDuty, rank = Rank,isboss = isboss}
     })
     SetNuiFocus(true, true)
 end
@@ -116,7 +117,7 @@ RegisterNUICallback("getReports", function(data, cb)
                                      function(d) cb(d) end, data.ID)
 end)
 RegisterNetEvent("fx-mdt:client:onCreatedReport",function(data)
-    assert(type(data) == "table","Wrong format expected table get %"):format(type(data))
+   
     SendNUIMessage({
         action="sendReport",
         data = {
@@ -126,7 +127,6 @@ RegisterNetEvent("fx-mdt:client:onCreatedReport",function(data)
 
 end)
 RegisterNUICallback("getEvidence", function(data, cb)
-
     QBCore.Functions.TriggerCallback("fx-mdt:server:GetEvidence",
                                      function(d) cb(d) end)
 end)
@@ -143,24 +143,36 @@ end)
 
 RegisterNUICallback("saveVehicleBolo", function(data, cb)
     local Data = data.Vehiculo
-    --Add Trigger Server Event
+
     TriggerServerEvent("fx-mdt:server:SaveVehicleBolo",Data)
     -- QBCore.Functions.TriggerCallback("fx-mdt:server:SaveVehicleBolo",
     --                                  function(d) cb(d) end, Data)
+    cb(true)
 end)
+
+RegisterNetEvent("fx-mdt:client:SaveVehicleBolo",function(data) 
+  SendNUIMessage({
+    action="addVehicleBolo",
+    data={
+        vehicleBolos = data
+    }
+  })
+
+end)
+
 RegisterNUICallback("getVehicleBolos", function(data, cb)
     QBCore.Functions.TriggerCallback("fx-mdt:server:GetVehicleBolos",
                                      function(d) cb(d) end)
 end)
 
-RegisterNetEvent("fx-mdt:client:SendBolos",function( data )
-    assert(type(data) == "table","Wrong format expected table get %"):format(type(data))
+-- RegisterNetEvent("fx-mdt:client:SendBolos",function( data )
+--     assert(type(data) == "table","Wrong format expected table get %"):format(type(data))
 
-    SendNUIMessage({
-        action="addVehicleBolo",
-        data={
-            vehicleBolos=data
-        }
-    })
-    -- body
-end)
+--     SendNUIMessage({
+--         action="addVehicleBolo",
+--         data={
+--             vehicleBolos=data
+--         }
+--     })
+--     -- body
+-- end)
