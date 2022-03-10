@@ -1,8 +1,10 @@
+# i won't be continued this resource, im creating another version
+
 # FX-MDT
 
 FX-MDT is a work in progress re-imagination of a mdt made in Svelte
 
-# THIS RESOURCE ISNT FINISHED
+
 
 ## Installation
 
